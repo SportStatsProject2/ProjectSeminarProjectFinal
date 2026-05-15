@@ -4,8 +4,8 @@ import numpy as np
 
 from sportstats.vision.ball_assignment import PlayerBallAssigner
 from sportstats.vision.geometry import get_center_of_bbox, get_foot_position, measure_distance
-from sportstats.vision.team_assignment import kmeans
-from sportstats.vision.tracking import FootballTracker
+from sportstats.vision.team_assignment import TeamAssigner, kmeans
+from sportstats.vision.tracking import FootballTracker, _tracks_match_frame_count
 
 
 class VisionHelpersTest(unittest.TestCase):
@@ -45,6 +45,22 @@ class VisionHelpersTest(unittest.TestCase):
 
         self.assertEqual(len(centroids), 2)
         self.assertEqual(set(labels.tolist()), {0, 1})
+
+    def test_team_color_uses_corner_background_even_when_sampling(self):
+        frame = np.zeros((200, 100, 3), dtype=np.uint8)
+        frame[:, :] = [0, 160, 0]
+        frame[20:90, 30:70] = [20, 20, 230]
+
+        color = TeamAssigner().get_player_color(frame, [0, 0, 100, 200])
+
+        self.assertGreater(color[2], 180)
+        self.assertLess(color[1], 80)
+
+    def test_stale_track_stub_is_rejected_by_frame_count(self):
+        tracks = {"players": [{}, {}], "referees": [{}, {}], "ball": [{}, {}]}
+
+        self.assertTrue(_tracks_match_frame_count(tracks, 2))
+        self.assertFalse(_tracks_match_frame_count(tracks, 3))
 
 
 if __name__ == "__main__":

@@ -42,7 +42,9 @@ class CameraMovementEstimator:
     ) -> list[tuple[float, float]]:
         if read_from_stub and stub_path and stub_path.exists():
             with stub_path.open("rb") as handle:
-                return pickle.load(handle)
+                movement = pickle.load(handle)
+            if isinstance(movement, list) and len(movement) == len(frames):
+                return movement
 
         if not frames:
             return []

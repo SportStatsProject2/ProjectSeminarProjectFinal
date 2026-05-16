@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 import unittest
 
 from sportstats import create_app
@@ -40,6 +41,19 @@ class AppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"Upload an MP4", response.data)
+
+    def test_vision_accepts_video_upload_and_returns_analysis_state(self):
+        self.app.config["YOLO_MODEL_PATH"] = "/tmp/sportstats-test/missing-best.pt"
+
+        response = self.client.post(
+            "/vision",
+            data={"video": (BytesIO(b"fake mp4 content"), "clip.mp4")},
+            content_type="multipart/form-data",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Add trained weights", response.data)
+        self.assertTrue((Path(self.app.config["UPLOAD_FOLDER"]) / "clip.mp4").exists())
 
 
 if __name__ == "__main__":

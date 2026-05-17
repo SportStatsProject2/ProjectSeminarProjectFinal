@@ -90,11 +90,13 @@ class WorldCupPredictorTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Official match-number bracket", response.data)
         self.assertIn(b"Simulated matches", response.data)
+        self.assertIn(b"Rating model", response.data)
+        self.assertIn(b"Elo", response.data)
 
     def test_wc_route_handles_invalid_seed(self):
         response = self.client.post("/world-cup-predictor", data={"seed": "nan"})
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Seed 2026", response.data)
+        self.assertIn(b"Scenario 2026", response.data)
 
 
 if __name__ == "__main__":

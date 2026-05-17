@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from sportstats import create_app
 from sportstats.config import TestConfig
+from sportstats.services.passing_network import DEMO_PASSES
 from sportstats.vision.pipeline import FootballAnalysisResult
 
 
@@ -62,6 +63,21 @@ class AppTest(unittest.TestCase):
         self.assertIn(b"No valid pass events loaded.", response.data)
         self.assertIn(b"Players involved</span><strong>0", response.data)
         self.assertNotIn(b"Players involved</span><strong>11", response.data)
+
+    def test_passing_network_removed_event_updates_total_passes(self):
+        response = self.client.post("/passing-network", data={"passes": json.dumps(DEMO_PASSES[:-1])})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Total passes</span><strong>25", response.data)
+
+    def test_passing_network_removed_player_updates_player_count(self):
+        passes_without_st = [
+            event for event in DEMO_PASSES if event["passer"] != "ST" and event["receiver"] != "ST"
+        ]
+        response = self.client.post("/passing-network", data={"passes": json.dumps(passes_without_st)})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Players involved</span><strong>10", response.data)
 
     def test_vision_rejects_wrong_file_type(self):
         response = self.client.post(

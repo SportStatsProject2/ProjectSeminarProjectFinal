@@ -4,15 +4,15 @@
 <section class="wc-page">
   <div class="wc-hero">
     <div>
-      <p class="eyebrow">Tournament simulation</p>
+      <p class="eyebrow">Tournament model</p>
       <h1>2026 FIFA World Cup Predictor</h1>
-      <p class="lead">Elo ratings drive each match, group tables qualify 32 teams, and the fixed knockout path projects a champion.</p>
+      <p class="lead">International Elo ratings feed the match model, group tables qualify 32 teams, and the knockout path projects a champion.</p>
     </div>
     <form class="panel wc-control-panel" method="post" action="{{ url_for('world_cup_predictor_submit') }}">
-      <label for="seed">Simulation seed</label>
+      <label for="seed">Scenario ID</label>
       <div class="wc-seed-row">
         <input id="seed" name="seed" type="number" min="0" max="999999" value="{{ seed or 2026 }}">
-        <button class="primary-action" type="submit">Run simulation</button>
+        <button class="primary-action" type="submit">Run projection</button>
       </div>
     </form>
   </div>
@@ -22,6 +22,11 @@
       <article class="panel wc-summary-card wc-champion-card">
         <span>Projected champion</span>
         <strong>{{ results.champion }}</strong>
+      </article>
+      <article class="panel wc-summary-card">
+        <span>Rating model</span>
+        <strong>Elo to xG</strong>
+        <small>Ratings shown in each knockout match</small>
       </article>
       <article class="panel wc-summary-card">
         <span>Final</span>
@@ -35,7 +40,7 @@
       <article class="panel wc-summary-card">
         <span>Simulated matches</span>
         <strong>{{ results.total_matches }}</strong>
-        <small>Seed {{ results.seed }}</small>
+        <small>Scenario {{ results.seed }}</small>
       </article>
     </section>
 
@@ -57,12 +62,12 @@
                   <div class="match-meta">Match {{ match.match_number }}</div>
                   <div class="team-row {% if match.winner == match.home_team %}is-winner{% endif %}">
                     <span class="team-seed">{{ match.home_seed }}</span>
-                    <span class="team-name">{{ match.home_team }}</span>
+                    <span class="team-name">{{ match.home_team }} <small>{{ match.home_elo|int }} Elo · {{ match.home_xg }} xG</small></span>
                     <span class="team-score">{{ match.home_score }}</span>
                   </div>
                   <div class="team-row {% if match.winner == match.away_team %}is-winner{% endif %}">
                     <span class="team-seed">{{ match.away_seed }}</span>
-                    <span class="team-name">{{ match.away_team }}</span>
+                    <span class="team-name">{{ match.away_team }} <small>{{ match.away_elo|int }} Elo · {{ match.away_xg }} xG</small></span>
                     <span class="team-score">{{ match.away_score }}</span>
                   </div>
                   {% if match.decided_on_pens %}
@@ -125,9 +130,9 @@
   {% else %}
     <section class="panel wc-empty-state">
       <div>
-        <p class="eyebrow">Ready</p>
+        <p class="eyebrow">Tournament model</p>
         <h2>Run a complete 2026 tournament projection.</h2>
-        <p>Seeded simulations make the result repeatable for a demo while still using randomized match scores.</p>
+        <p>The projection uses the current international ratings file, 2026 group structure, and fixed knockout path.</p>
       </div>
     </section>
   {% endif %}

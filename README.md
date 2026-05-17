@@ -2,9 +2,9 @@
 
 SportStatsProject is a Flask football analytics application that combines statistical match prediction, passing-network visualization, and a full YOLO/OpenCV football video-analysis pipeline.
 
-The project is structured for the seminar marking criteria: demoable use cases, clear run instructions, Docker support, automated checks in CI, architecture documentation, and a GitHub issue/PR workflow.
+The repository includes local run instructions, Docker support, automated checks, architecture notes, and a pull-request workflow.
 
-## Demoable Use Cases
+## Core Capabilities
 
 1. Match prediction with Poisson expected goals and Monte Carlo simulation.
 2. Elo/team-strength tuning for richer match forecasts.
@@ -132,6 +132,6 @@ Every issue should have acceptance criteria and an assignee. Every PR should ref
 
 ## Team Roles
 
-- Daniel: YOLO/OpenCV video analysis, detector training, model integration, CV demo preparation.
+- Daniel: YOLO/OpenCV video analysis, detector training, model integration, CV presentation workflow.
 - Assylkhan Balmukhanov: Flask website, statistical predictor, Elo/Monte Carlo workstream, CI/CD, documentation, release workflow.
 - Shared: issues, PR reviews, demo script, README updates, and final seminar presentation.

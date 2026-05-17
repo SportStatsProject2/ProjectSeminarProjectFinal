@@ -91,6 +91,22 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
 }
 .primary-action:hover { background: #12583f; }
 .primary-action:disabled { cursor: wait; opacity: 0.72; }
+.secondary-action {
+  align-items: center;
+  background: #f4f8f5;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 14px;
+}
+.secondary-action:hover { background: #eaf2ed; border-color: #b7c8bd; }
+.form-actions { display: grid; gap: 10px; grid-template-columns: minmax(0, 1.5fr) repeat(2, minmax(0, 1fr)); }
 .processing-state {
   background: #eef5f0;
   border: 1px solid #c8d8ce;
@@ -147,6 +163,16 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
   padding: 24px;
 }
 .alert { background: #fff0f0; border: 1px solid #efb7b7; border-radius: 6px; color: var(--danger); font-weight: 700; padding: 10px 12px; }
+.notice {
+  background: #fff8e8;
+  border: 1px solid #e8d39b;
+  border-radius: 6px;
+  color: #76520a;
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
+  padding: 10px 12px;
+}
 .pitch-preview, .pitch-network {
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.12) 50%, transparent 50%) 0 0 / 80px 80px, #287a4a;
   border: 8px solid #f2f7f3;
@@ -173,6 +199,7 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
 .passing-layout { display: grid; gap: 28px; grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr); }
 .passing-input { min-width: 0; }
 .passing-form { display: grid; gap: 16px; }
+.network-edit-state { margin: 0; }
 .passing-output { display: grid; gap: 18px; min-width: 0; }
 .network-panel { display: grid; gap: 18px; }
 .network-header {
@@ -194,6 +221,8 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
 .network-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
 .network-tables { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .network-list li:first-child { border-top: 0; }
+.network-list small { color: var(--muted); display: block; font-size: 11px; font-weight: 700; margin-top: 2px; }
+.network-empty { min-height: 360px; }
 video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 .content-stack { display: grid; gap: 26px; }
 .diagram { align-items: center; display: grid; gap: 14px; grid-template-columns: 1fr 48px 1fr 48px 1fr; }
@@ -203,7 +232,7 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 @media (max-width: 900px) {
   .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables { grid-template-columns: 1fr; }
   .topbar { align-items: flex-start; padding: 16px 20px; }
-  .feature-grid, .form-grid, .metric-grid, .network-metrics { grid-template-columns: 1fr; }
+  .feature-grid, .form-grid, .metric-grid, .network-metrics, .form-actions { grid-template-columns: 1fr; }
   .network-header { display: grid; }
   h1 { font-size: 36px; }
   .diagram span { height: 24px; justify-self: center; width: 3px; }

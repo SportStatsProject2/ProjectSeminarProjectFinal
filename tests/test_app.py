@@ -1,4 +1,5 @@
 from io import BytesIO
+import json
 import unittest
 from unittest.mock import patch
 
@@ -32,6 +33,27 @@ class AppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["home_team"], "Home")
+
+    def test_passing_network_uses_submitted_json(self):
+        passes = [
+            {"passer": "Alpha", "receiver": "Beta", "start_x": 10, "start_y": 50, "end_x": 35, "end_y": 50},
+            {"passer": "Beta", "receiver": "Gamma", "start_x": 35, "start_y": 50, "end_x": 65, "end_y": 45},
+        ]
+
+        response = self.client.post("/passing-network", data={"passes": json.dumps(passes)})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Alpha", response.data)
+        self.assertIn(b"Gamma", response.data)
+        self.assertIn(b"Players involved</span><strong>3", response.data)
+
+    def test_passing_network_invalid_json_does_not_fall_back_to_demo(self):
+        response = self.client.post("/passing-network", data={"passes": "[not valid"})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"JSON is invalid", response.data)
+        self.assertIn(b"No valid pass events loaded.", response.data)
+        self.assertIn(b"Players involved</span><strong>0", response.data)
 
     def test_vision_rejects_wrong_file_type(self):
         response = self.client.post(

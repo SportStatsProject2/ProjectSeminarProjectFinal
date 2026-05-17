@@ -15,18 +15,17 @@ DEMO_PASSES = [
     {"passer": "RCB", "receiver": "RB", "start_x": 25, "start_y": 72, "end_x": 38, "end_y": 84},
     {"passer": "RB", "receiver": "RW", "start_x": 38, "start_y": 84, "end_x": 66, "end_y": 82},
     {"passer": "RW", "receiver": "RB", "start_x": 66, "start_y": 82, "end_x": 40, "end_y": 82},
-    {"passer": "DM", "receiver": "LCM", "start_x": 43, "start_y": 49, "end_x": 54, "end_y": 35},
-    {"passer": "DM", "receiver": "RCM", "start_x": 43, "start_y": 51, "end_x": 54, "end_y": 65},
-    {"passer": "LCM", "receiver": "AM", "start_x": 54, "start_y": 35, "end_x": 66, "end_y": 48},
-    {"passer": "RCM", "receiver": "AM", "start_x": 54, "start_y": 65, "end_x": 66, "end_y": 52},
+    {"passer": "DM", "receiver": "CM", "start_x": 43, "start_y": 50, "end_x": 55, "end_y": 50},
+    {"passer": "CM", "receiver": "AM", "start_x": 55, "start_y": 50, "end_x": 66, "end_y": 50},
+    {"passer": "CM", "receiver": "DM", "start_x": 55, "start_y": 50, "end_x": 43, "end_y": 50},
     {"passer": "AM", "receiver": "ST", "start_x": 66, "start_y": 50, "end_x": 84, "end_y": 50},
     {"passer": "AM", "receiver": "LW", "start_x": 66, "start_y": 49, "end_x": 73, "end_y": 22},
     {"passer": "AM", "receiver": "RW", "start_x": 66, "start_y": 51, "end_x": 73, "end_y": 78},
     {"passer": "ST", "receiver": "AM", "start_x": 84, "start_y": 50, "end_x": 67, "end_y": 50},
-    {"passer": "LCM", "receiver": "LB", "start_x": 53, "start_y": 36, "end_x": 40, "end_y": 18},
-    {"passer": "RCM", "receiver": "RB", "start_x": 53, "start_y": 64, "end_x": 40, "end_y": 82},
-    {"passer": "LB", "receiver": "LCM", "start_x": 40, "start_y": 18, "end_x": 54, "end_y": 36},
-    {"passer": "RB", "receiver": "RCM", "start_x": 40, "start_y": 82, "end_x": 54, "end_y": 64},
+    {"passer": "CM", "receiver": "LB", "start_x": 55, "start_y": 49, "end_x": 40, "end_y": 18},
+    {"passer": "CM", "receiver": "RB", "start_x": 55, "start_y": 51, "end_x": 40, "end_y": 82},
+    {"passer": "LB", "receiver": "CM", "start_x": 40, "start_y": 18, "end_x": 55, "end_y": 49},
+    {"passer": "RB", "receiver": "CM", "start_x": 40, "start_y": 82, "end_x": 55, "end_y": 51},
     {"passer": "DM", "receiver": "AM", "start_x": 42, "start_y": 50, "end_x": 66, "end_y": 50},
     {"passer": "AM", "receiver": "ST", "start_x": 66, "start_y": 50, "end_x": 84, "end_y": 50},
     {"passer": "DM", "receiver": "AM", "start_x": 44, "start_y": 50, "end_x": 66, "end_y": 51},
@@ -41,6 +40,21 @@ def build_demo_network() -> dict:
 
 def demo_passes_json() -> str:
     return json.dumps(DEMO_PASSES, indent=2)
+
+
+def parse_pass_events(raw_events: str) -> list[dict]:
+    if not raw_events.strip():
+        return []
+    try:
+        payload = json.loads(raw_events)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"JSON is invalid near line {exc.lineno}, column {exc.colno}.") from exc
+
+    if isinstance(payload, dict):
+        payload = payload.get("passes")
+    if not isinstance(payload, list):
+        raise ValueError("Pass data must be a JSON array, or an object with a passes array.")
+    return payload
 
 
 def build_network(events: list[dict]) -> dict:
@@ -108,6 +122,9 @@ def build_network(events: list[dict]) -> dict:
     player_count = len(nodes)
     possible_links = player_count * (player_count - 1)
     progressive_passes = sum(1 for progression in progressions if progression >= 10)
+    warnings = []
+    if player_count > 11:
+        warnings.append(f"{player_count} players are present in this data. Filter to one team/lineup for a standard XI view.")
 
     return {
         "nodes": sorted(nodes, key=lambda node: node["player"]),
@@ -120,6 +137,8 @@ def build_network(events: list[dict]) -> dict:
         "progressive_passes": progressive_passes,
         "average_progression": round(sum(progressions) / total_passes, 1) if total_passes else 0.0,
         "central_player": sorted_nodes[0]["player"] if sorted_nodes else "N/A",
+        "warnings": warnings,
+        "has_events": total_passes > 0,
     }
 
 

@@ -1,6 +1,7 @@
 import unittest
+import json
 
-from sportstats.services.passing_network import build_network, demo_passes_json
+from sportstats.services.passing_network import build_demo_network, build_network, demo_passes_json, parse_pass_events
 
 
 class PassingNetworkServiceTest(unittest.TestCase):
@@ -41,12 +42,40 @@ class PassingNetworkServiceTest(unittest.TestCase):
         self.assertEqual(network["edges"][0]["average_progression"], 20.0)
 
     def test_demo_passes_json_is_valid_input(self):
-        import json
-
         network = build_network(json.loads(demo_passes_json()))
 
         self.assertGreater(network["total_passes"], 0)
-        self.assertGreater(network["player_count"], 0)
+        self.assertEqual(network["player_count"], 11)
+
+    def test_demo_network_uses_standard_eleven(self):
+        network = build_demo_network()
+
+        self.assertEqual(network["player_count"], 11)
+        self.assertEqual(network["warnings"], [])
+
+    def test_parse_pass_events_accepts_wrapped_payload(self):
+        events = parse_pass_events(
+            json.dumps(
+                {
+                    "passes": [
+                        {"passer": "A", "receiver": "B", "start_x": 10, "start_y": 50, "end_x": 20, "end_y": 50}
+                    ]
+                }
+            )
+        )
+
+        self.assertEqual(events[0]["passer"], "A")
+
+    def test_build_network_warns_when_more_than_eleven_players_are_present(self):
+        events = [
+            {"passer": f"P{index}", "receiver": f"P{index + 1}", "start_x": 10, "start_y": 50, "end_x": 20, "end_y": 50}
+            for index in range(12)
+        ]
+
+        network = build_network(events)
+
+        self.assertEqual(network["player_count"], 13)
+        self.assertIn("13 players", network["warnings"][0])
 
     def test_build_network_rejects_invalid_coordinates(self):
         with self.assertRaisesRegex(ValueError, "start_x"):

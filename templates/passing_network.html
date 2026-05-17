@@ -7,12 +7,17 @@
     <h1>Team Passing Network</h1>
     <p class="lead">A passing network turns completed pass events into a tactical map of team structure, ball circulation, and the players that connect possession phases.</p>
     {% if error %}<p class="alert">{{ error }}</p>{% endif %}
-    <form class="panel passing-form" method="post" action="{{ url_for('passing_network_submit') }}">
+    <form class="panel passing-form" method="post" action="{{ url_for('passing_network_submit') }}" data-network-form>
       <label>
         Pass event JSON
-        <textarea name="passes" rows="18" spellcheck="false">{{ raw_events }}</textarea>
+        <textarea name="passes" rows="18" spellcheck="false" data-network-input>{{ raw_events }}</textarea>
       </label>
-      <button class="primary-action" type="submit">Build network</button>
+      <div class="form-actions">
+        <button class="primary-action" type="submit" data-network-submit>Update network</button>
+        <button class="secondary-action" type="button" data-load-sample>Load sample XI</button>
+        <button class="secondary-action" type="button" data-clear-network>Clear</button>
+      </div>
+      <p class="processing-state network-edit-state" data-network-state hidden>JSON changed. Update the network to redraw the pitch.</p>
     </form>
   </div>
 
@@ -25,38 +30,51 @@
         </div>
         <div class="metric-row compact"><span>Central player</span><strong>{{ network.central_player }}</strong></div>
       </div>
+      {% if network.warnings %}
+        {% for warning in network.warnings %}
+          <p class="notice">{{ warning }}</p>
+        {% endfor %}
+      {% endif %}
 
-      <div class="pitch-network tactical-pitch">
-        <svg viewBox="0 0 100 100" role="img" aria-label="Passing network pitch">
-          <defs>
-            <marker id="pass-arrow" markerHeight="4" markerWidth="4" orient="auto" refX="3.5" refY="2">
-              <path d="M0,0 L4,2 L0,4 Z"></path>
-            </marker>
-          </defs>
-          <rect x="3" y="5" width="94" height="90" rx="1"></rect>
-          <line x1="50" y1="5" x2="50" y2="95"></line>
-          <circle cx="50" cy="50" r="9"></circle>
-          <rect x="3" y="26" width="16" height="48"></rect>
-          <rect x="81" y="26" width="16" height="48"></rect>
-          <rect x="3" y="38" width="6" height="24"></rect>
-          <rect x="91" y="38" width="6" height="24"></rect>
-          {% for edge in network.edges %}
-            <line
-              class="pass-line"
-              x1="{{ edge.source_x }}"
-              y1="{{ edge.source_y }}"
-              x2="{{ edge.target_x }}"
-              y2="{{ edge.target_y }}"
-              style="stroke-width: {{ edge.width }};"
-              marker-end="url(#pass-arrow)"
-            ></line>
-          {% endfor %}
-          {% for node in network.nodes %}
-            <circle class="network-node" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ node.radius }}"></circle>
-            <text x="{{ node.x }}" y="{{ node.y + 1 }}" text-anchor="middle">{{ node.player }}</text>
-          {% endfor %}
-        </svg>
-      </div>
+      {% if network.has_events %}
+        <div class="pitch-network tactical-pitch">
+          <svg viewBox="0 0 100 100" role="img" aria-label="Passing network pitch">
+            <defs>
+              <marker id="pass-arrow" markerHeight="4" markerWidth="4" orient="auto" refX="3.5" refY="2">
+                <path d="M0,0 L4,2 L0,4 Z"></path>
+              </marker>
+            </defs>
+            <rect x="3" y="5" width="94" height="90" rx="1"></rect>
+            <line x1="50" y1="5" x2="50" y2="95"></line>
+            <circle cx="50" cy="50" r="9"></circle>
+            <rect x="3" y="26" width="16" height="48"></rect>
+            <rect x="81" y="26" width="16" height="48"></rect>
+            <rect x="3" y="38" width="6" height="24"></rect>
+            <rect x="91" y="38" width="6" height="24"></rect>
+            {% for edge in network.edges %}
+              <line
+                class="pass-line"
+                x1="{{ edge.source_x }}"
+                y1="{{ edge.source_y }}"
+                x2="{{ edge.target_x }}"
+                y2="{{ edge.target_y }}"
+                style="stroke-width: {{ edge.width }};"
+                marker-end="url(#pass-arrow)"
+              >
+                <title>{{ edge.source }} to {{ edge.target }}: {{ edge.count }} passes, {{ edge.average_progression }} x progression</title>
+              </line>
+            {% endfor %}
+            {% for node in network.nodes %}
+              <circle class="network-node" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ node.radius }}">
+                <title>{{ node.player }}: {{ node.touches }} involvements, {{ node.passes_sent }} sent, {{ node.passes_received }} received</title>
+              </circle>
+              <text x="{{ node.x }}" y="{{ node.y + 1 }}" text-anchor="middle">{{ node.player }}</text>
+            {% endfor %}
+          </svg>
+        </div>
+      {% else %}
+        <div class="empty-state network-empty">No valid pass events loaded.</div>
+      {% endif %}
 
       <div class="metric-grid network-metrics">
         <div class="metric-tile"><span>Total passes</span><strong>{{ network.total_passes }}</strong></div>
@@ -74,10 +92,13 @@
         <ol class="score-list network-list">
           {% for edge in network.edges[:8] %}
             <li>
-              <span>{{ edge.source }} -> {{ edge.target }}</span>
+              <span>{{ edge.source }} -> {{ edge.target }} <small>{{ edge.average_progression }} x</small></span>
               <strong>{{ edge.count }}</strong>
             </li>
           {% endfor %}
+          {% if not network.edges %}
+            <li><span>No links</span><strong>0</strong></li>
+          {% endif %}
         </ol>
       </div>
       <div class="panel">
@@ -85,13 +106,55 @@
         <ol class="score-list network-list">
           {% for node in network.top_nodes[:8] %}
             <li>
-              <span>{{ node.player }}</span>
+              <span>{{ node.player }} <small>{{ node.passes_sent }} sent / {{ node.passes_received }} received</small></span>
               <strong>{{ node.touches }}</strong>
             </li>
           {% endfor %}
+          {% if not network.top_nodes %}
+            <li><span>No players</span><strong>0</strong></li>
+          {% endif %}
         </ol>
       </div>
     </section>
   </div>
 </section>
+<script>
+  const networkForm = document.querySelector("[data-network-form]");
+  if (networkForm) {
+    const input = networkForm.querySelector("[data-network-input]");
+    const submit = networkForm.querySelector("[data-network-submit]");
+    const state = networkForm.querySelector("[data-network-state]");
+    const sample = {{ sample_events|tojson }};
+    const original = input ? input.value : "";
+    const setDirtyState = () => {
+      if (!input || !state) return;
+      state.hidden = input.value === original;
+    };
+    if (input) {
+      input.addEventListener("input", setDirtyState);
+    }
+    networkForm.addEventListener("submit", () => {
+      if (submit) {
+        submit.disabled = true;
+        submit.textContent = "Updating...";
+      }
+    });
+    const loadSample = networkForm.querySelector("[data-load-sample]");
+    if (loadSample && input) {
+      loadSample.addEventListener("click", () => {
+        input.value = sample;
+        setDirtyState();
+        input.focus();
+      });
+    }
+    const clear = networkForm.querySelector("[data-clear-network]");
+    if (clear && input) {
+      clear.addEventListener("click", () => {
+        input.value = "[]";
+        setDirtyState();
+        input.focus();
+      });
+    }
+  }
+</script>
 {% endblock %}

@@ -23,10 +23,10 @@ def main() -> int:
     except ImportError as exc:
         raise SystemExit("Install training dependencies first: python -m pip install -r requirements-training.txt") from exc
 
-    args.location.mkdir(parents=True, exist_ok=True)
+    args.location.parent.mkdir(parents=True, exist_ok=True)
     rf = Roboflow(api_key=args.api_key)
     project = rf.workspace(args.workspace).project(args.project)
-    dataset = project.version(args.version).download(args.format, location=str(args.location))
+    dataset = project.version(args.version).download(args.format, location=str(args.location), overwrite=True)
     print(dataset.location)
     return 0
 

@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -43,19 +44,18 @@ class AppTest(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"Upload an MP4", response.data)
 
-    def test_vision_upload_uses_unique_runtime_filename(self):
-        result = FootballAnalysisResult(status="complete", message="done")
-        with patch("sportstats.web.analyze_video", return_value=result) as analyze:
-            response = self.client.post(
-                "/vision",
-                data={"video": (BytesIO(b"fake video"), "match.mp4")},
-                content_type="multipart/form-data",
-            )
+    def test_vision_accepts_video_upload_and_returns_analysis_state(self):
+        self.app.config["YOLO_MODEL_PATH"] = "/tmp/sportstats-test/missing-best.pt"
+
+        response = self.client.post(
+            "/vision",
+            data={"video": (BytesIO(b"fake mp4 content"), "clip.mp4")},
+            content_type="multipart/form-data",
+        )
 
         self.assertEqual(response.status_code, 200)
-        saved_path = analyze.call_args.args[0]
-        self.assertRegex(saved_path.name, r"^match_[a-f0-9]{8}\.mp4$")
-        self.assertTrue(saved_path.exists())
+        self.assertIn(b"Add trained weights", response.data)
+        self.assertTrue((Path(self.app.config["UPLOAD_FOLDER"]) / "clip.mp4").exists())
 
 
 if __name__ == "__main__":

@@ -116,11 +116,11 @@ def create_app(config_object: type[Config] = Config) -> Flask:
         raw_events = request.form.get("passes", "").strip()
         try:
             events = parse_pass_events(raw_events)
-            network = build_network(events) if events else build_demo_network()
+            network = build_network(events)
             return render_template(
                 "passing_network.html",
                 network=network,
-                raw_events=raw_events or demo_passes_json(),
+                raw_events=raw_events,
                 sample_events=demo_passes_json(),
                 error=None,
             )

@@ -26,21 +26,27 @@
    ```bash
    export ROBOFLOW_API_KEY=your_key
    python scripts/download_roboflow_dataset.py \
-     --workspace your-workspace \
-     --project your-project \
+     --workspace roboflow-jvuqo \
+     --project football-players-detection-3zvbc \
      --version 1 \
-     --format yolov8
+     --format yolov8 \
+     --location datasets/football-players-detection-1
    ```
 
 3. Train on GPU.
 
-   Use Colab or another GPU machine:
+   Use Colab or another GPU machine. The demo baseline was trained with `yolov8s.pt`, 100 epochs, `imgsz=640`, and `batch=16` on a Colab T4:
 
    ```bash
-   python scripts/train_yolo.py --data datasets/data.yaml --model yolov8x.pt --epochs 100 --imgsz 640
+   python scripts/train_yolo.py \
+     --data datasets/football-players-detection-1/data.yaml \
+     --model yolov8s.pt \
+     --epochs 100 \
+     --imgsz 640 \
+     --device 0
    ```
 
-   If training is too slow, use `yolov8m.pt` or `yolov8s.pt`. If your installed Ultralytics version supports newer model names, `yolo11m.pt` is also a good option.
+   For better ball detection, rerun with `--imgsz 960` and a smaller batch size. The ball is the hardest class because it is small and underrepresented compared with players.
 
 4. Copy trained weights.
 
@@ -73,4 +79,5 @@
 - Keep `VISION_MAX_FRAMES=120` or `300` during development so the demo is fast.
 - Use cached stubs unless you change the model or calibration.
 - Run with `--no-stubs` after changing weights, camera-motion logic, or perspective vertices.
+- Validate the trained detector before the demo. The first `yolov8s.pt` 100-epoch run produced strong player/referee/goalkeeper metrics, while ball recall remained the main limitation.
 - Do not commit `.pt` files, videos, generated outputs, stubs, or `runs/` folders.

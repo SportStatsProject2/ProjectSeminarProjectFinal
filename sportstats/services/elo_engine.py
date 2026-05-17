@@ -1,6 +1,4 @@
 import pandas as pd
-import math
-from pathlib import Path
 
 # --- 1. CONFIGURATION ---
 BASE_RATING = 1500

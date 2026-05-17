@@ -9,7 +9,7 @@ from flask import Flask, jsonify, render_template, request
 from werkzeug.utils import secure_filename
 
 from sportstats.config import BASE_DIR, Config
-from sportstats.services.passing_network import build_demo_network, build_network
+from sportstats.services.passing_network import build_demo_network, build_network, demo_passes_json
 from sportstats.services.prediction import TeamProfile, predict_match
 from sportstats.services.yolo import analyze_video, is_allowed_video
 
@@ -46,7 +46,12 @@ def create_app(config_object: type[Config] = Config) -> Flask:
 
     @app.get("/passing-network")
     def passing_network():
-        return render_template("passing_network.html", network=build_demo_network(), error=None)
+        return render_template(
+            "passing_network.html",
+            network=build_demo_network(),
+            raw_events=demo_passes_json(),
+            error=None,
+        )
 
     @app.post("/passing-network")
     def passing_network_submit():
@@ -54,13 +59,19 @@ def create_app(config_object: type[Config] = Config) -> Flask:
         try:
             events = json.loads(raw_events) if raw_events else []
             network = build_network(events) if events else build_demo_network()
-            return render_template("passing_network.html", network=network, error=None)
+            return render_template(
+                "passing_network.html",
+                network=network,
+                raw_events=raw_events or demo_passes_json(),
+                error=None,
+            )
         except (TypeError, ValueError) as exc:
             app.logger.info("Invalid passing network payload: %s", exc)
             return (
                 render_template(
                     "passing_network.html",
                     network=build_demo_network(),
+                    raw_events=raw_events or demo_passes_json(),
                     error="Pass events need passer, receiver, start_x, start_y, end_x and end_y fields.",
                 ),
                 400,

@@ -1,47 +1,97 @@
 {% extends "base.html" %}
 {% block title %}Passing Network{% endblock %}
 {% block content %}
-<section class="split-layout wide">
-  <div>
+<section class="passing-layout">
+  <div class="passing-input">
     <p class="eyebrow">Tactical visualization</p>
     <h1>Team Passing Network</h1>
+    <p class="lead">A passing network turns completed pass events into a tactical map of team structure, ball circulation, and the players that connect possession phases.</p>
     {% if error %}<p class="alert">{{ error }}</p>{% endif %}
-    <form class="panel" method="post" action="{{ url_for('passing_network_submit') }}">
+    <form class="panel passing-form" method="post" action="{{ url_for('passing_network_submit') }}">
       <label>
-        Pass event data
-        <textarea name="passes" rows="12" spellcheck="false">[
-  {"passer":"GK","receiver":"LCB","start_x":8,"start_y":50,"end_x":24,"end_y":28},
-  {"passer":"LCB","receiver":"DM","start_x":24,"start_y":28,"end_x":42,"end_y":50},
-  {"passer":"DM","receiver":"AM","start_x":42,"start_y":50,"end_x":64,"end_y":50},
-  {"passer":"AM","receiver":"ST","start_x":64,"start_y":50,"end_x":84,"end_y":50}
-]</textarea>
+        Pass event JSON
+        <textarea name="passes" rows="18" spellcheck="false">{{ raw_events }}</textarea>
       </label>
-      <button class="primary-action" type="submit">Build passing network</button>
+      <button class="primary-action" type="submit">Build network</button>
     </form>
   </div>
 
-  <aside class="panel">
-    <div class="pitch-network">
-      <svg viewBox="0 0 100 100" role="img" aria-label="Passing network pitch">
-        <rect x="3" y="5" width="94" height="90" rx="1"></rect>
-        <line x1="50" y1="5" x2="50" y2="95"></line>
-        <circle cx="50" cy="50" r="9"></circle>
-        {% for edge in network.edges %}
-          <line class="pass-line" x1="{{ edge.source_x }}" y1="{{ edge.source_y }}" x2="{{ edge.target_x }}" y2="{{ edge.target_y }}" style="stroke-width: {{ 0.6 + edge.count }};"></line>
-        {% endfor %}
-        {% for node in network.nodes %}
-          <circle class="network-node" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ 2.7 + (node.touches / 3) }}"></circle>
-          <text x="{{ node.x }}" y="{{ node.y + 1 }}" text-anchor="middle">{{ node.player }}</text>
-        {% endfor %}
-      </svg>
-    </div>
-    <div class="metric-row"><span>Total passes</span><strong>{{ network.total_passes }}</strong></div>
-    <h3>Strongest links</h3>
-    <ol class="score-list">
-      {% for edge in network.edges[:5] %}
-        <li><span>{{ edge.source }} -> {{ edge.target }}</span><strong>{{ edge.count }}</strong></li>
-      {% endfor %}
-    </ol>
-  </aside>
+  <div class="passing-output">
+    <section class="panel network-panel">
+      <div class="network-header">
+        <div>
+          <p class="eyebrow">Average positions</p>
+          <h2>Completed Pass Map</h2>
+        </div>
+        <div class="metric-row compact"><span>Central player</span><strong>{{ network.central_player }}</strong></div>
+      </div>
+
+      <div class="pitch-network tactical-pitch">
+        <svg viewBox="0 0 100 100" role="img" aria-label="Passing network pitch">
+          <defs>
+            <marker id="pass-arrow" markerHeight="4" markerWidth="4" orient="auto" refX="3.5" refY="2">
+              <path d="M0,0 L4,2 L0,4 Z"></path>
+            </marker>
+          </defs>
+          <rect x="3" y="5" width="94" height="90" rx="1"></rect>
+          <line x1="50" y1="5" x2="50" y2="95"></line>
+          <circle cx="50" cy="50" r="9"></circle>
+          <rect x="3" y="26" width="16" height="48"></rect>
+          <rect x="81" y="26" width="16" height="48"></rect>
+          <rect x="3" y="38" width="6" height="24"></rect>
+          <rect x="91" y="38" width="6" height="24"></rect>
+          {% for edge in network.edges %}
+            <line
+              class="pass-line"
+              x1="{{ edge.source_x }}"
+              y1="{{ edge.source_y }}"
+              x2="{{ edge.target_x }}"
+              y2="{{ edge.target_y }}"
+              style="stroke-width: {{ edge.width }};"
+              marker-end="url(#pass-arrow)"
+            ></line>
+          {% endfor %}
+          {% for node in network.nodes %}
+            <circle class="network-node" cx="{{ node.x }}" cy="{{ node.y }}" r="{{ node.radius }}"></circle>
+            <text x="{{ node.x }}" y="{{ node.y + 1 }}" text-anchor="middle">{{ node.player }}</text>
+          {% endfor %}
+        </svg>
+      </div>
+
+      <div class="metric-grid network-metrics">
+        <div class="metric-tile"><span>Total passes</span><strong>{{ network.total_passes }}</strong></div>
+        <div class="metric-tile"><span>Players involved</span><strong>{{ network.player_count }}</strong></div>
+        <div class="metric-tile"><span>Passing links</span><strong>{{ network.link_count }}</strong></div>
+        <div class="metric-tile"><span>Progressive passes</span><strong>{{ network.progressive_passes }}</strong></div>
+        <div class="metric-tile"><span>Network density</span><strong>{{ network.network_density }}%</strong></div>
+        <div class="metric-tile"><span>Avg progression</span><strong>{{ network.average_progression }}</strong></div>
+      </div>
+    </section>
+
+    <section class="network-tables">
+      <div class="panel">
+        <h2>Strongest Links</h2>
+        <ol class="score-list network-list">
+          {% for edge in network.edges[:8] %}
+            <li>
+              <span>{{ edge.source }} -> {{ edge.target }}</span>
+              <strong>{{ edge.count }}</strong>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+      <div class="panel">
+        <h2>Player Involvement</h2>
+        <ol class="score-list network-list">
+          {% for node in network.top_nodes[:8] %}
+            <li>
+              <span>{{ node.player }}</span>
+              <strong>{{ node.touches }}</strong>
+            </li>
+          {% endfor %}
+        </ol>
+      </div>
+    </section>
+  </div>
 </section>
 {% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Elo Ratings{% endblock %}
+{% block content %}
+<section class="split-layout">
+  <div>
+    <p class="eyebrow">Team Rankings</p>
+    <h1>International Elo Ratings</h1>
+    <p class="lead">Historical performance-based rankings for international football teams.</p>
+    
+    <div class="panel">
+      <h3>Underlying Formula</h3>
+      <p>The Elo rating system calculates the relative skill levels of teams. After every match, ratings are updated based on the result and the expected outcome:</p>
+      <code class="block">NewRating = OldRating + K * (Actual - Expected)</code>
+      <p>Where:</p>
+      <ul>
+        <li><strong>K:</strong> The development coefficient (set to 30), determining how drastically ratings change.</li>
+        <li><strong>Actual:</strong> 1 for a win, 0.5 for a draw, 0 for a loss.</li>
+        <li><strong>Expected:</strong> The win probability based on the rating difference:
+          <code class="block">1 / (1 + 10^((RatingOpponent - RatingTeam) / 400))</code>
+        </li>
+      </ul>
+      <p>A <strong>Home Advantage</strong> of 100 points is added to the home team's rating (unless the match is neutral) for the purpose of calculating the expected result.</p>
+    </div>
+  </div>
+
+  <aside class="panel result-panel">
+    <p class="eyebrow">Top 20 Teams</p>
+    <table class="data-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border);">
+          <th style="text-align: left; padding: 0.5rem;">Rank</th>
+          <th style="text-align: left; padding: 0.5rem;">Team</th>
+          <th style="text-align: right; padding: 0.5rem;">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for team in teams %}
+          <tr style="border-bottom: 1px solid var(--border-low);">
+            <td style="padding: 0.5rem;">{{ loop.index }}</td>
+            <td style="padding: 0.5rem;">{{ team.Team }}</td>
+            <td style="padding: 0.5rem; text-align: right;"><strong>{{ team['Elo Rating'] }}</strong></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </aside>
+</section>
+{% endblock %}

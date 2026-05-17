@@ -51,4 +51,4 @@ If your source video has a different camera angle, update `DEFAULT_VERTICES_1080
 - Download/export the Roboflow football player detection dataset with your own API key.
 - Train the detector on Colab or another GPU machine.
 - Copy the trained `best.pt` into `models/best.pt`.
-- Run a short demo clip first, then raise `VISION_MAX_FRAMES` for the final demo.
+- Leave `VISION_MAX_FRAMES=0` or unset for full-video processing. Set a positive value only when you need a short smoke test.

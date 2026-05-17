@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from sportstats.services.model_assets import ensure_model_file
 from sportstats.vision import FootballAnalysisPipeline, FootballAnalysisResult, PipelineConfig
 
 
@@ -14,6 +15,7 @@ def analyze_video(
     *,
     output_dir: Path,
     model_path: str | None = None,
+    model_url: str | None = None,
     max_frames: int | None = 300,
     use_stubs: bool = True,
     stub_dir: Path = Path("football_analysis/stubs"),
@@ -22,7 +24,7 @@ def analyze_video(
     if not video_path.exists():
         return FootballAnalysisResult(status="error", message="Video file does not exist.")
 
-    resolved_model = _resolve_model_path(model_path, allow_pretrained=allow_pretrained)
+    resolved_model = _resolve_model_path(model_path, model_url=model_url, allow_pretrained=allow_pretrained)
     if resolved_model is None:
         return FootballAnalysisResult(
             status="unavailable",
@@ -61,13 +63,19 @@ def _missing_optional_dependencies() -> list[str]:
     return missing
 
 
-def _resolve_model_path(model_path: str | None, *, allow_pretrained: bool) -> str | None:
+def _resolve_model_path(model_path: str | None, *, model_url: str | None = None, allow_pretrained: bool) -> str | None:
     if model_path:
-        path = Path(model_path).expanduser()
-        if path.exists():
+        try:
+            path = ensure_model_file(model_path, model_url)
+        except Exception:
+            path = None
+        if path is not None:
             return str(path)
-    default_path = Path("models/best.pt")
-    if default_path.exists():
+    try:
+        default_path = ensure_model_file(Path("models/best.pt"), model_url)
+    except Exception:
+        default_path = None
+    if default_path is not None:
         return str(default_path)
     if allow_pretrained:
         return "yolov8n.pt"

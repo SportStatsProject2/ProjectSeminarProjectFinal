@@ -88,6 +88,7 @@ def create_app(config_object: type[Config] = Config) -> Flask:
             upload_path,
             output_dir=Path(app.config["OUTPUT_FOLDER"]),
             model_path=app.config.get("YOLO_MODEL_PATH"),
+            model_url=app.config.get("YOLO_MODEL_URL"),
             max_frames=app.config["VISION_MAX_FRAMES"],
             use_stubs=app.config["VISION_USE_STUBS"],
             stub_dir=Path(app.config["VISION_STUB_DIR"]),

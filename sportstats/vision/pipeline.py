@@ -65,6 +65,7 @@ class FootballAnalysisPipeline:
             read_from_stub=self.config.use_stubs,
             stub_path=stub_base.with_name(f"{stub_base.name}_tracks.pkl"),
         )
+        ball_detections = _frames_with_tracks(tracks["ball"])
         tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
         tracker.add_positions_to_tracks(tracks)
 
@@ -99,7 +100,6 @@ class FootballAnalysisPipeline:
 
         player_ids = _unique_ids(tracks["players"])
         referee_ids = _unique_ids(tracks["referees"])
-        ball_detections = sum(1 for frame_tracks in tracks["ball"] if frame_tracks)
         team_1_control, team_2_control = _ball_control_percentages(team_ball_control)
         elapsed = perf_counter() - started_at
 
@@ -117,6 +117,7 @@ class FootballAnalysisPipeline:
             elapsed_seconds=round(elapsed, 2),
             notes=[
                 "Team colors are estimated from shirt pixels with deterministic k-means.",
+                "Track counts are unique tracker IDs across the clip, not the live number of players or referees.",
                 "Speed is calculated only inside the calibrated perspective polygon.",
             ],
         )
@@ -127,6 +128,10 @@ def _unique_ids(frame_tracks: list[dict[int, dict]]) -> set[int]:
     for frame in frame_tracks:
         ids.update(frame.keys())
     return ids
+
+
+def _frames_with_tracks(frame_tracks: list[dict[int, dict]]) -> int:
+    return sum(1 for frame in frame_tracks if frame)
 
 
 def _ball_control_percentages(team_ball_control: list[int]) -> tuple[float, float]:

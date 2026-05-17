@@ -43,6 +43,12 @@ Put the trained detector weights here:
 models/best.pt
 ```
 
+The public project model can be downloaded automatically:
+
+```bash
+python scripts/download_model.py
+```
+
 Then run the analysis on a local video:
 
 ```bash
@@ -50,6 +56,8 @@ python yolo_inference.py football_analysis/input_videos/08fd33_4.mp4 --model mod
 ```
 
 The annotated video is written to `football_analysis/output_videos/`. The Flask upload page writes outputs to `static/outputs/`.
+
+If `models/best.pt` is missing, the Flask app can download it from `YOLO_MODEL_URL` in `.env` before running the first video analysis.
 
 If you only want a baseline smoke test with the COCO model, add `--allow-pretrained` to the CLI or set `ALLOW_PRETRAINED_YOLO=1` in `.env`. The baseline can detect people and sports balls, but it will not classify football-specific players/referees/goalkeepers as well as the trained model.
 

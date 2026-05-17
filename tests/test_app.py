@@ -55,6 +55,14 @@ class AppTest(unittest.TestCase):
         self.assertIn(b"No valid pass events loaded.", response.data)
         self.assertIn(b"Players involved</span><strong>0", response.data)
 
+    def test_passing_network_empty_array_clears_demo_network(self):
+        response = self.client.post("/passing-network", data={"passes": "[]"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"No valid pass events loaded.", response.data)
+        self.assertIn(b"Players involved</span><strong>0", response.data)
+        self.assertNotIn(b"Players involved</span><strong>11", response.data)
+
     def test_vision_rejects_wrong_file_type(self):
         response = self.client.post(
             "/vision",

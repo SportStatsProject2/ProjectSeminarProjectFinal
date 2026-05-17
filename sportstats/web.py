@@ -13,6 +13,7 @@ from sportstats.services.passing_network import build_demo_network, build_networ
 from sportstats.services.prediction import TeamProfile, predict_match
 from sportstats.services.yolo import analyze_video, is_allowed_video
 from sportstats.services.xg_calculator import calculate_geometry, calculate_xg
+from sportstats.services.elo_engine import calculate_elo, get_elo_dataframe
 
 
 def create_app(config_object: type[Config] = Config) -> Flask:
@@ -68,6 +69,14 @@ def create_app(config_object: type[Config] = Config) -> Flask:
             "xg": round(xg, 3)
         }
         return render_template("xg_calculator.html", result=result)
+
+    @app.get("/elo-ratings")
+    def elo_ratings():
+        csv_path = BASE_DIR / "sportstats" / "data" / "results.csv"
+        elo_dict = calculate_elo(csv_path)
+        elo_df = get_elo_dataframe(elo_dict)
+        top_teams = elo_df.head(20).to_dict(orient="records")
+        return render_template("elo_ratings.html", teams=top_teams)
 
     @app.post("/api/predict")
     def api_predict():

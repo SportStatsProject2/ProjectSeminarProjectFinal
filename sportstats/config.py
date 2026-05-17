@@ -22,7 +22,7 @@ class Config:
     ALLOWED_VIDEO_EXTENSIONS = {"mp4", "mov", "avi", "mkv"}
     YOLO_MODEL_PATH = os.getenv("YOLO_MODEL_PATH", str(BASE_DIR / "models" / "best.pt"))
     ALLOW_PRETRAINED_YOLO = _bool_env("ALLOW_PRETRAINED_YOLO", False)
-    VISION_MAX_FRAMES = int(os.getenv("VISION_MAX_FRAMES", "300"))
+    VISION_MAX_FRAMES = int(os.getenv("VISION_MAX_FRAMES", "60"))
     VISION_USE_STUBS = _bool_env("VISION_USE_STUBS", True)
     VISION_STUB_DIR = os.getenv("VISION_STUB_DIR", str(BASE_DIR / "football_analysis" / "stubs"))
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")

@@ -63,6 +63,7 @@ h3 { font-size: 16px; margin: 22px 0 10px; }
 .feature-card { display: block; min-height: 188px; padding: 22px; }
 .feature-card:hover { border-color: #a9bbb0; transform: translateY(-1px); }
 .panel { padding: 24px; }
+.upload-panel { display: grid; gap: 16px; }
 .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 label { color: var(--ink); display: grid; font-size: 13px; font-weight: 800; gap: 7px; }
 input, textarea {
@@ -89,7 +90,44 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
   padding: 11px 16px;
 }
 .primary-action:hover { background: #12583f; }
+.primary-action:disabled { cursor: wait; opacity: 0.72; }
+.processing-state {
+  background: #eef5f0;
+  border: 1px solid #c8d8ce;
+  border-radius: 6px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 800;
+  margin: 0;
+  padding: 10px 12px;
+}
 .result-panel { min-height: 320px; }
+.vision-result h2 { margin-top: 10px; }
+.status-pill {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  margin: 0 0 4px;
+  padding: 6px 10px;
+  text-transform: uppercase;
+}
+.status-complete { background: #e6f5ec; color: var(--green); }
+.status-error { background: #fff0f0; color: var(--danger); }
+.status-unavailable { background: #fff7e6; color: #8a5f0e; }
+.metric-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 18px 0; }
+.metric-tile {
+  background: #f8fbf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  min-height: 74px;
+  padding: 12px;
+}
+.metric-tile span { color: var(--muted); font-size: 12px; font-weight: 800; }
+.metric-tile strong { color: var(--ink); font-size: 22px; line-height: 1; }
 .metric-row, .score-list li {
   align-items: center;
   border-top: 1px solid var(--line);
@@ -141,7 +179,7 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 @media (max-width: 900px) {
   .topbar, .hero, .split-layout, .diagram { grid-template-columns: 1fr; }
   .topbar { align-items: flex-start; padding: 16px 20px; }
-  .feature-grid, .form-grid { grid-template-columns: 1fr; }
+  .feature-grid, .form-grid, .metric-grid { grid-template-columns: 1fr; }
   h1 { font-size: 36px; }
   .diagram span { height: 24px; justify-self: center; width: 3px; }
 }

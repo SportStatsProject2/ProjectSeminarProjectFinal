@@ -8,7 +8,7 @@
     {% if error %}<p class="alert">{{ error }}</p>{% endif %}
     <form class="panel" method="post" action="{{ url_for('passing_network_submit') }}">
       <label>
-        Pass events JSON
+        Pass event data
         <textarea name="passes" rows="12" spellcheck="false">[
   {"passer":"GK","receiver":"LCB","start_x":8,"start_y":50,"end_x":24,"end_y":28},
   {"passer":"LCB","receiver":"DM","start_x":24,"start_y":28,"end_x":42,"end_y":50},
@@ -16,7 +16,7 @@
   {"passer":"AM","receiver":"ST","start_x":64,"start_y":50,"end_x":84,"end_y":50}
 ]</textarea>
       </label>
-      <button class="primary-action" type="submit">Build network</button>
+      <button class="primary-action" type="submit">Build passing network</button>
     </form>
   </div>
 

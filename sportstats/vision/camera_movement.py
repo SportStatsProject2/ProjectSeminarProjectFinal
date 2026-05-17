@@ -101,9 +101,23 @@ class CameraMovementEstimator:
     def adjust_positions_to_tracks(tracks: Tracks, camera_movement_per_frame: list[tuple[float, float]]) -> None:
         for object_tracks in tracks.values():
             for frame_index, frame_tracks in enumerate(object_tracks):
-                movement_x, movement_y = camera_movement_per_frame[frame_index]
+                if frame_index < len(camera_movement_per_frame):
+                    movement_x, movement_y = camera_movement_per_frame[frame_index]
+                else:
+                    movement_x, movement_y = (0.0, 0.0)
                 for track_info in frame_tracks.values():
                     position = track_info.get("position")
                     if position is None:
                         continue
                     track_info["position_adjusted"] = (position[0] - movement_x, position[1] - movement_y)
+
+
+def _load_camera_stub(stub_path: Path, *, expected_frame_count: int) -> list[tuple[float, float]] | None:
+    try:
+        with stub_path.open("rb") as handle:
+            movement = pickle.load(handle)
+    except (EOFError, OSError, pickle.UnpicklingError, TypeError, ValueError):
+        return None
+    if not isinstance(movement, list) or len(movement) != expected_frame_count:
+        return None
+    return movement

@@ -1,9 +1,11 @@
 from io import BytesIO
 from pathlib import Path
 import unittest
+from unittest.mock import patch
 
 from sportstats import create_app
 from sportstats.config import TestConfig
+from sportstats.vision.pipeline import FootballAnalysisResult
 
 
 class AppTest(unittest.TestCase):

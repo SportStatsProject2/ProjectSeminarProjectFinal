@@ -26,14 +26,14 @@ def analyze_video(
     if resolved_model is None:
         return FootballAnalysisResult(
             status="unavailable",
-            message="Add trained weights at models/best.pt or set YOLO_MODEL_PATH. Set ALLOW_PRETRAINED_YOLO=1 only for a COCO baseline demo.",
+            message="The football vision model is not available on this server.",
         )
 
     missing = _missing_optional_dependencies()
     if missing:
         return FootballAnalysisResult(
             status="unavailable",
-            message=f"Install the vision dependencies first: {', '.join(missing)}.",
+            message=f"The computer-vision runtime is missing: {', '.join(missing)}.",
         )
 
     try:

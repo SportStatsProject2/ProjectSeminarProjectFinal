@@ -3,10 +3,10 @@
 {% block content %}
 <section class="hero">
   <div>
-    <p class="eyebrow">Football analytics project</p>
+    <p class="eyebrow">Football analytics suite</p>
     <h1>Match prediction, passing structure, and full YOLO match analysis.</h1>
     <p class="lead">
-      A Flask project for the seminar: statistical forecasting, pass-network graphics, and a computer-vision pipeline for players, referees, ball control, speed, and distance.
+      Statistical forecasting, pass-network graphics, and a computer-vision pipeline for players, referees, ball control, speed, and distance.
     </p>
   </div>
   <div class="pitch-preview" aria-label="Football pitch analytics preview">
@@ -20,24 +20,24 @@
 
 <section class="feature-grid" aria-label="Project features">
   <a class="feature-card" href="{{ url_for('predictor') }}">
-    <span class="feature-kicker">Use case 1</span>
+    <span class="feature-kicker">Forecasting</span>
     <h2>Match Predictor</h2>
     <p>Poisson expected goals and Monte Carlo simulations with Elo/team-strength inputs.</p>
   </a>
   <a class="feature-card" href="{{ url_for('passing_network') }}">
-    <span class="feature-kicker">Use case 2</span>
+    <span class="feature-kicker">Team structure</span>
     <h2>Passing Networks</h2>
     <p>Aggregates pass events into player nodes and weighted directed links.</p>
   </a>
   <a class="feature-card" href="{{ url_for('vision') }}">
-    <span class="feature-kicker">Use case 3</span>
+    <span class="feature-kicker">Computer vision</span>
     <h2>YOLO Vision</h2>
     <p>Tracks players, referees, and ball; assigns teams; estimates possession, camera motion, speed, and distance.</p>
   </a>
   <a class="feature-card" href="{{ url_for('architecture') }}">
-    <span class="feature-kicker">Use case 4</span>
-    <h2>Quality Evidence</h2>
-    <p>Run instructions, Docker, tests, CI, architecture docs, issue templates, and PR workflow.</p>
+    <span class="feature-kicker">Engineering</span>
+    <h2>System Design</h2>
+    <p>Architecture, automated checks, Docker support, and a documented delivery workflow.</p>
   </a>
 </section>
 {% endblock %}

@@ -170,6 +170,30 @@ textarea { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace
 .pass-line { stroke: rgba(255, 219, 107, 0.78); stroke-linecap: round; }
 .network-node { fill: #ffffff; stroke: var(--blue); stroke-width: 0.7; }
 .pitch-network text { fill: #102016; font-size: 4px; font-weight: 900; pointer-events: none; }
+.passing-layout { display: grid; gap: 28px; grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1.28fr); }
+.passing-input { min-width: 0; }
+.passing-form { display: grid; gap: 16px; }
+.passing-output { display: grid; gap: 18px; min-width: 0; }
+.network-panel { display: grid; gap: 18px; }
+.network-header {
+  align-items: start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+.compact {
+  background: #f8fbf8;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-width: 180px;
+  padding: 10px 12px;
+}
+.compact strong { color: var(--ink); }
+.tactical-pitch { background: linear-gradient(90deg, rgba(255, 255, 255, 0.11) 50%, transparent 50%) 0 0 / 70px 70px, #23764a; }
+.tactical-pitch svg marker path { fill: rgba(255, 219, 107, 0.88); }
+.network-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+.network-tables { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.network-list li:first-child { border-top: 0; }
 video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 .content-stack { display: grid; gap: 26px; }
 .diagram { align-items: center; display: grid; gap: 14px; grid-template-columns: 1fr 48px 1fr 48px 1fr; }
@@ -177,9 +201,10 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 .diagram span { background: var(--green); height: 3px; }
 
 @media (max-width: 900px) {
-  .topbar, .hero, .split-layout, .diagram { grid-template-columns: 1fr; }
+  .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables { grid-template-columns: 1fr; }
   .topbar { align-items: flex-start; padding: 16px 20px; }
-  .feature-grid, .form-grid, .metric-grid { grid-template-columns: 1fr; }
+  .feature-grid, .form-grid, .metric-grid, .network-metrics { grid-template-columns: 1fr; }
+  .network-header { display: grid; }
   h1 { font-size: 36px; }
   .diagram span { height: 24px; justify-self: center; width: 3px; }
 }

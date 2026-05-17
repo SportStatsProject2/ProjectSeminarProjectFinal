@@ -45,13 +45,13 @@ class AppTest(unittest.TestCase):
         self.assertIn(b"Upload an MP4", response.data)
 
     def test_vision_accepts_video_upload_and_returns_analysis_state(self):
-        self.app.config["YOLO_MODEL_PATH"] = "/tmp/sportstats-test/missing-best.pt"
-
-        response = self.client.post(
-            "/vision",
-            data={"video": (BytesIO(b"fake mp4 content"), "clip.mp4")},
-            content_type="multipart/form-data",
-        )
+        result = FootballAnalysisResult(status="unavailable", message="Add trained weights before running vision.")
+        with patch("sportstats.web.analyze_video", return_value=result):
+            response = self.client.post(
+                "/vision",
+                data={"video": (BytesIO(b"fake mp4 content"), "clip.mp4")},
+                content_type="multipart/form-data",
+            )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Add trained weights", response.data)

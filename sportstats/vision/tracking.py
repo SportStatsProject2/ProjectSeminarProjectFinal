@@ -29,9 +29,10 @@ class FootballTracker:
         stub_path: Path | None = None,
     ) -> Tracks:
         if read_from_stub and stub_path and stub_path.exists():
-            cached_tracks = _load_tracks_stub(stub_path, expected_frame_count=len(frames))
-            if cached_tracks is not None:
-                return cached_tracks
+            with stub_path.open("rb") as handle:
+                stub_tracks = pickle.load(handle)
+            if _tracks_match_frame_count(stub_tracks, len(frames)):
+                return stub_tracks
 
         tracks: Tracks = {"players": [], "referees": [], "ball": []}
         fallback_track_id = 10_000
@@ -74,13 +75,18 @@ class FootballTracker:
                     object_id = fallback_track_id
                     fallback_track_id += 1
 
-                tracks[category][-1][object_id] = {
+                track_info = {
                     "bbox": [float(value) for value in bbox],
                     "class_id": class_id,
                     "class_name": class_name,
                     "confidence": confidence,
                     "interpolated": False,
                 }
+                if category == "ball":
+                    current_ball = tracks[category][-1].get(object_id)
+                    if current_ball and current_ball.get("confidence", 0.0) >= confidence:
+                        continue
+                tracks[category][-1][object_id] = track_info
 
         if stub_path:
             stub_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,20 +177,9 @@ def _class_to_category(class_name: str) -> str | None:
     return None
 
 
-def _load_tracks_stub(stub_path: Path, *, expected_frame_count: int) -> Tracks | None:
-    try:
-        with stub_path.open("rb") as handle:
-            tracks = pickle.load(handle)
-    except (EOFError, OSError, pickle.UnpicklingError, TypeError, ValueError):
-        return None
-    return tracks if _tracks_match_frame_count(tracks, expected_frame_count) else None
-
-
-def _tracks_match_frame_count(tracks: object, expected_frame_count: int) -> bool:
-    if not isinstance(tracks, dict):
-        return False
-    for key in ("players", "referees", "ball"):
-        value = tracks.get(key)
-        if not isinstance(value, list) or len(value) != expected_frame_count:
-            return False
-    return True
+def _tracks_match_frame_count(tracks: Tracks, expected_frame_count: int) -> bool:
+    return (
+        isinstance(tracks, dict)
+        and set(tracks) >= {"players", "referees", "ball"}
+        and all(len(tracks[key]) == expected_frame_count for key in ("players", "referees", "ball"))
+    )

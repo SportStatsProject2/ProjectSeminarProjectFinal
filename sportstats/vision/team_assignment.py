@@ -13,13 +13,21 @@ class TeamAssigner:
     player_team_cache: dict[int, int] = field(default_factory=dict)
     team_colors: dict[int, tuple[int, int, int]] = field(default_factory=dict)
     _team_centroids: np.ndarray | None = None
+    sample_frame_limit: int = 30
 
-    def assign_team_colors(self, frame, player_tracks: dict[int, dict]) -> None:
+    def assign_team_colors(self, frames: list, player_tracks_by_frame: list[dict[int, dict]]) -> None:
         colors = []
-        for player in player_tracks.values():
-            bbox = player.get("bbox")
-            if bbox:
-                colors.append(self.get_player_color(frame, bbox))
+        sampled_frames = 0
+        for frame, player_tracks in zip(frames, player_tracks_by_frame):
+            if not player_tracks:
+                continue
+            sampled_frames += 1
+            for player in player_tracks.values():
+                bbox = player.get("bbox")
+                if bbox:
+                    colors.append(self.get_player_color(frame, bbox))
+            if sampled_frames >= self.sample_frame_limit and len(colors) >= 2:
+                break
 
         if len(colors) < 2:
             self._team_centroids = np.asarray([[255, 255, 255], [60, 160, 60]], dtype=float)
@@ -35,8 +43,7 @@ class TeamAssigner:
         if not frames or not tracks.get("players"):
             return
 
-        first_frame_index = next((index for index, frame_tracks in enumerate(tracks["players"]) if frame_tracks), 0)
-        self.assign_team_colors(frames[first_frame_index], tracks["players"][first_frame_index])
+        self.assign_team_colors(frames, tracks["players"])
 
         for frame_index, player_tracks in enumerate(tracks["players"]):
             for player_id, player in player_tracks.items():
@@ -72,24 +79,19 @@ class TeamAssigner:
         if len(pixels) < 2:
             return pixels.mean(axis=0) if len(pixels) else np.asarray([255, 255, 255], dtype=float)
 
-        sample = pixels[:: max(len(pixels) // 1500, 1)]
-        centroids, labels = kmeans(sample, k=2, iterations=12)
-        label_image = labels.reshape(top_half.shape[:2]) if len(sample) == len(pixels) else None
-
-        if label_image is not None:
-            corners = [
-                int(label_image[0, 0]),
-                int(label_image[0, -1]),
-                int(label_image[-1, 0]),
-                int(label_image[-1, -1]),
-            ]
-            background_cluster = max(set(corners), key=corners.count)
-            player_cluster = 1 - background_cluster
-            return centroids[player_cluster]
-
-        distances_to_centroids = np.linalg.norm(sample[:, None, :] - centroids[None, :, :], axis=2)
-        full_labels = np.argmin(distances_to_centroids, axis=1)
-        player_cluster = int(np.argmin(np.bincount(full_labels, minlength=2)))
+        sample_stride = max(len(pixels) // 1500, 1)
+        sample = pixels[::sample_stride]
+        centroids, _labels = kmeans(sample, k=2, iterations=12)
+        distances_to_centroids = np.linalg.norm(pixels[:, None, :] - centroids[None, :, :], axis=2)
+        full_labels = np.argmin(distances_to_centroids, axis=1).reshape(top_half.shape[:2])
+        corners = [
+            int(full_labels[0, 0]),
+            int(full_labels[0, -1]),
+            int(full_labels[-1, 0]),
+            int(full_labels[-1, -1]),
+        ]
+        background_cluster = max(set(corners), key=corners.count)
+        player_cluster = 1 - background_cluster
         return centroids[player_cluster]
 
 
@@ -101,7 +103,7 @@ def kmeans(points: np.ndarray, *, k: int, iterations: int = 20) -> tuple[np.ndar
         return padded.astype(float), np.zeros(len(points), dtype=int)
 
     centroids = _deterministic_initial_centroids(points, k)
-    labels = np.zeros(len(points), dtype=int)
+    labels = np.full(len(points), -1, dtype=int)
     for _ in range(iterations):
         distances = np.linalg.norm(points[:, None, :] - centroids[None, :, :], axis=2)
         new_labels = np.argmin(distances, axis=1)

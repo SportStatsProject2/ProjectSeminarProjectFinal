@@ -15,10 +15,8 @@ from sportstats.services.xg_calculator import calculate_geometry, calculate_xg
 from sportstats.services.elo_engine import calculate_elo, get_elo_dataframe
 from sportstats.services.wc_predictor import (
     WC_2026_GROUPS,
-    get_qualified_teams,
     load_elo_ratings,
-    simulate_group_stage,
-    simulate_knockouts,
+    simulate_tournament,
 )
 
 
@@ -86,17 +84,16 @@ def create_app(config_object: type[Config] = Config) -> Flask:
 
     @app.get("/world-cup-predictor")
     def world_cup_predictor():
-        return render_template("wc_predictor.html", results=None)
+        return render_template("wc_predictor.html", results=None, seed=2026)
 
     @app.post("/world-cup-predictor")
     def world_cup_predictor_submit():
         elo_path = BASE_DIR / "sportstats" / "data" / "international_elo_ratings.csv"
         elo_dict = load_elo_ratings(elo_path)
-        group_results, standings = simulate_group_stage(WC_2026_GROUPS, elo_dict)
-        qualified_teams = get_qualified_teams(standings)
-        bracket = simulate_knockouts(qualified_teams, elo_dict)
-        results = {"groups": group_results, "standings": standings, "bracket": bracket}
-        return render_template("wc_predictor.html", results=results)
+        seed = _int_value(request.form.get("seed"), 2026)
+        seed = max(0, min(seed, 999999))
+        results = simulate_tournament(WC_2026_GROUPS, elo_dict, seed=seed)
+        return render_template("wc_predictor.html", results=results, seed=seed)
 
     @app.post("/api/predict")
     def api_predict():
@@ -210,6 +207,13 @@ def _float_value(value, default: float) -> float:
     try:
         return float(value)
     except (TypeError, ValueError):
+        return default
+
+
+def _int_value(value, default: int) -> int:
+    try:
+        return int(float(value))
+    except (TypeError, ValueError, OverflowError):
         return default
 
 

@@ -228,12 +228,197 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 .diagram { align-items: center; display: grid; gap: 14px; grid-template-columns: 1fr 48px 1fr 48px 1fr; }
 .diagram div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-weight: 900; padding: 22px; text-align: center; }
 .diagram span { background: var(--green); height: 3px; }
+.wc-page { display: grid; gap: 30px; }
+.wc-hero {
+  align-items: end;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(340px, 0.85fr);
+}
+.wc-control-panel { display: grid; gap: 12px; }
+.wc-seed-row { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) auto; }
+.wc-summary-grid { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.wc-summary-card { display: grid; gap: 6px; min-height: 116px; }
+.wc-summary-card span, .wc-summary-card small, .match-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+.wc-summary-card strong { color: var(--ink); font-size: 22px; line-height: 1.15; }
+.wc-champion-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f7f0dc 100%);
+  border-color: #dfc274;
+}
+.wc-champion-card strong { color: #7a540d; font-size: 28px; }
+.wc-section-header {
+  align-items: start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.wc-section-header h2 { margin-bottom: 0; }
+.wc-bronze-pill, .wc-qualified-count {
+  background: #f6faf7;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+.wc-bracket-panel { overflow: hidden; }
+.wc-bracket {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(5, minmax(190px, 1fr));
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 6px 2px 12px;
+}
+.bracket-round {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+}
+.bracket-round h3 {
+  border-bottom: 1px solid var(--line);
+  margin: 0 0 12px;
+  min-height: 38px;
+  padding-bottom: 9px;
+  text-align: center;
+}
+.bracket-matches {
+  align-content: space-around;
+  display: grid;
+  gap: 10px;
+  min-height: 1420px;
+}
+.match-count-16 .bracket-matches { grid-template-rows: repeat(16, minmax(76px, max-content)); }
+.match-count-8 .bracket-matches { grid-template-rows: repeat(8, minmax(76px, max-content)); }
+.match-count-4 .bracket-matches { grid-template-rows: repeat(4, minmax(76px, max-content)); }
+.match-count-2 .bracket-matches { grid-template-rows: repeat(2, minmax(76px, max-content)); }
+.match-count-1 .bracket-matches { grid-template-rows: minmax(76px, max-content); }
+.match-box {
+  background: #fbfdfb;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  position: relative;
+}
+.bracket-round:not(:last-child) .match-box::after {
+  background: #c9d5cd;
+  content: "";
+  height: 1px;
+  position: absolute;
+  right: -17px;
+  top: 50%;
+  width: 16px;
+}
+.team-row {
+  align-items: center;
+  border-radius: 6px;
+  color: var(--muted);
+  display: grid;
+  gap: 7px;
+  grid-template-columns: 38px minmax(0, 1fr) 22px;
+  min-height: 25px;
+  padding: 2px 5px;
+}
+.team-row.is-winner {
+  background: #eaf5ee;
+  color: var(--ink);
+  font-weight: 900;
+}
+.team-seed {
+  color: inherit;
+  font-size: 11px;
+  font-weight: 900;
+}
+.team-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.team-score { font-weight: 900; text-align: right; }
+.match-note {
+  border-top: 1px dashed #cbd8d0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  padding-top: 6px;
+  text-align: center;
+}
+.wc-standings-section { display: grid; gap: 0; }
+.wc-group-grid { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.wc-group-card { min-width: 0; padding: 18px; }
+.wc-group-card h3 {
+  color: var(--green);
+  margin: 0 0 12px;
+}
+.wc-table-wrap { overflow-x: auto; }
+.wc-standings-table {
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 100%;
+  width: 100%;
+}
+.wc-standings-table th {
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  padding: 0 6px 8px;
+  text-align: right;
+  text-transform: uppercase;
+}
+.wc-standings-table th:first-child, .wc-standings-table td:first-child { text-align: left; }
+.wc-standings-table td {
+  border-bottom: 1px solid #edf2ef;
+  padding: 9px 6px;
+  text-align: right;
+  white-space: nowrap;
+}
+.wc-standings-table tr:last-child td { border-bottom: 0; }
+.wc-standings-table .is-qualified td { background: #f5faf6; }
+.rank {
+  color: var(--muted);
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 900;
+  margin-right: 8px;
+  width: 14px;
+}
+.qualification-badge {
+  background: #f0f5f2;
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 8px;
+}
+.is-qualified .qualification-badge { background: #e3f3e9; color: var(--green); }
+.wc-empty-state {
+  align-items: center;
+  display: flex;
+  min-height: 260px;
+}
 
 @media (max-width: 900px) {
-  .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables { grid-template-columns: 1fr; }
+  .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables, .wc-hero { grid-template-columns: 1fr; }
   .topbar { align-items: flex-start; padding: 16px 20px; }
-  .feature-grid, .form-grid, .metric-grid, .network-metrics, .form-actions { grid-template-columns: 1fr; }
+  .feature-grid, .form-grid, .metric-grid, .network-metrics, .form-actions, .wc-summary-grid, .wc-group-grid, .wc-seed-row { grid-template-columns: 1fr; }
   .network-header { display: grid; }
   h1 { font-size: 36px; }
   .diagram span { height: 24px; justify-self: center; width: 3px; }
+  .wc-section-header { display: grid; }
+  .wc-bronze-pill, .wc-qualified-count { border-radius: 8px; white-space: normal; }
+  .wc-bracket { grid-template-columns: 1fr; min-width: 0; }
+  .bracket-matches { min-height: 0; }
+  .bracket-round:not(:last-child) .match-box::after { display: none; }
 }

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}2026 World Cup Predictor{% endblock %}
+{% block content %}
+<section>
+  <p class="eyebrow">Tournament Simulation</p>
+  <h1>2026 FIFA World Cup Predictor</h1>
+  <p class="lead">Full 48-team simulation: 12 groups, qualifying for a 32-team knockout bracket.</p>
+  
+  <form method="post" action="{{ url_for('world_cup_predictor_submit') }}" style="margin-bottom: 2rem;">
+    <button class="primary-action" type="submit">Run Full Simulation</button>
+  </form>
+
+  {% if results %}
+    <div class="panel champion-highlight">
+      <p class="eyebrow" style="text-align: center;">World Cup Champion</p>
+      <h1 style="text-align: center; color: var(--primary); font-size: 4rem;">🏆 {{ results.bracket.Champion }} 🏆</h1>
+    </div>
+
+    <!-- Group Stage Section -->
+    <h2 style="margin-top: 4rem; border-bottom: 2px solid var(--border);">Group Stage Standings</h2>
+    <div class="group-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; margin-top: 2rem;">
+      {% for group_name, table in results.standings.items() %}
+        <div class="panel group-panel">
+          <h3>{{ group_name }}</h3>
+          <table style="width: 100%; font-size: 0.9rem; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-low); color: var(--text-low);">
+                <th style="text-align: left;">Team</th>
+                <th style="text-align: right;">Pts</th>
+                <th style="text-align: right;">GD</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in table %}
+                <tr style="border-bottom: 1px solid var(--border-low); {% if loop.index <= 2 %}color: var(--primary); font-weight: bold;{% elif loop.index == 3 %}color: #fbbf24;{% endif %}">
+                  <td style="padding: 0.4rem 0;">{{ entry.name }}</td>
+                  <td style="text-align: right;">{{ entry.points }}</td>
+                  <td style="text-align: right;">{{ entry.gd }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Knockout Bracket Section -->
+    <h2 style="margin-top: 4rem; border-bottom: 2px solid var(--border);">Knockout Bracket</h2>
+    <div class="bracket-container" style="display: flex; gap: 2rem; overflow-x: auto; padding: 2rem 0; align-items: flex-start;">
+      {% set rounds = ["Round of 32", "Round of 16", "Quarter-Finals", "Semi-Finals", "Final"] %}
+      {% for round in rounds %}
+        <div class="bracket-column" style="flex: 0 0 240px; display: flex; flex-direction: column; justify-content: space-around; min-height: 800px;">
+          <h3 style="text-align: center; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">{{ round }}</h3>
+          {% for match in results.bracket[round] %}
+            <div class="match-box" style="background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.8rem; margin: 1rem 0; position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: center; {% if match.winner == match.home_team %}color: var(--primary); font-weight: bold;{% endif %}">
+                <span>{{ match.home_team }}</span>
+                <span>{{ match.home_score }}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem; {% if match.winner == match.away_team %}color: var(--primary); font-weight: bold;{% endif %}">
+                <span>{{ match.away_team }}</span>
+                <span>{{ match.away_score }}</span>
+              </div>
+              {% if match.decided_on_pens %}
+                <div style="text-align: center; font-size: 0.75rem; color: var(--text-low); margin-top: 0.4rem; border-top: 1px dashed var(--border-low); padding-top: 0.2rem;">
+                  (Wins on pens)
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="panel empty-state" style="text-align: center; padding: 4rem;">
+      <h2 style="color: var(--text-low);">Ready for the 2026 Kickoff?</h2>
+      <p>Simulate all 72 group matches and the entire knockout path to the trophy.</p>
+    </div>
+  {% endif %}
+</section>
+
+<style>
+  .champion-highlight {
+    background: linear-gradient(135deg, var(--surface) 0%, #1a3a2a 100%);
+    border: 2px solid var(--primary);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 3rem;
+    margin-top: 2rem;
+  }
+  .group-panel h3 {
+    margin-top: 0;
+    color: var(--primary);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+  }
+  .match-box::after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    top: 50%;
+    width: 1rem;
+    height: 1px;
+    background: var(--border);
+  }
+  .bracket-column:last-child .match-box::after {
+    display: none;
+  }
+</style>
+{% endblock %}

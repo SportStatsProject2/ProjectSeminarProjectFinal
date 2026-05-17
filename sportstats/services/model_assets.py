@@ -6,7 +6,7 @@ from urllib.request import urlopen
 
 
 DEFAULT_MODEL_URL = (
-    "https://github.com/AssylkhanBalmukhanov/SportStatsProject/"
+    "https://github.com/SportStatsProject2/ProjectSeminarProjectFinal/"
     "releases/download/yolo-model-v1/best.pt"
 )
 

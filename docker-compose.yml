@@ -9,7 +9,7 @@ services:
     environment:
       SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}
       YOLO_MODEL_PATH: ${YOLO_MODEL_PATH:-models/best.pt}
-      YOLO_MODEL_URL: ${YOLO_MODEL_URL:-https://github.com/AssylkhanBalmukhanov/SportStatsProject/releases/download/yolo-model-v1/best.pt}
+      YOLO_MODEL_URL: ${YOLO_MODEL_URL:-https://github.com/SportStatsProject2/ProjectSeminarProjectFinal/releases/download/yolo-model-v1/best.pt}
       ALLOW_PRETRAINED_YOLO: ${ALLOW_PRETRAINED_YOLO:-0}
       VISION_MAX_FRAMES: ${VISION_MAX_FRAMES:-0}
       VISION_USE_STUBS: ${VISION_USE_STUBS:-1}

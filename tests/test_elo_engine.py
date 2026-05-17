@@ -1,8 +1,7 @@
 import unittest
-import pandas as pd
 from sportstats import create_app
 from sportstats.config import TestConfig
-from sportstats.services.elo_engine import calculate_elo, get_elo_dataframe, expected_result
+from sportstats.services.elo_engine import calculate_elo, expected_result
 
 class EloEngineTest(unittest.TestCase):
     def setUp(self):

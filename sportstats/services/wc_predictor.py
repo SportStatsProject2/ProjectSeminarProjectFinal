@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import random
 import os
-from pathlib import Path
 
 NAME_ALIASES = {
     'Czechia': 'Czech Republic',

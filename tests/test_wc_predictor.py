@@ -1,7 +1,7 @@
 import unittest
 from sportstats import create_app
 from sportstats.config import TestConfig
-from sportstats.services.wc_predictor import WC_2026_GROUPS, load_elo_ratings, simulate_group_stage, get_qualified_teams, simulate_knockouts
+from sportstats.services.wc_predictor import WC_2026_GROUPS, simulate_group_stage, get_qualified_teams, simulate_knockouts
 
 class WorldCupPredictorTest(unittest.TestCase):
     def setUp(self):

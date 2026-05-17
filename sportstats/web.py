@@ -13,6 +13,13 @@ from sportstats.services.passing_network import build_demo_network, build_networ
 from sportstats.services.prediction import TeamProfile, predict_match
 from sportstats.services.yolo import analyze_video, is_allowed_video
 from sportstats.services.xg_calculator import calculate_geometry, calculate_xg
+from sportstats.services.wc_predictor import (
+    WC_2026_GROUPS,
+    load_elo_ratings,
+    simulate_group_stage,
+    get_qualified_teams,
+    simulate_knockouts,
+)
 
 
 def create_app(config_object: type[Config] = Config) -> Flask:
@@ -68,6 +75,28 @@ def create_app(config_object: type[Config] = Config) -> Flask:
             "xg": round(xg, 3)
         }
         return render_template("xg_calculator.html", result=result)
+
+    @app.get("/world-cup-predictor")
+    def world_cup_predictor():
+        return render_template("wc_predictor.html", results=None)
+
+    @app.post("/world-cup-predictor")
+    def world_cup_predictor_submit():
+        elo_path = BASE_DIR / "sportstats" / "data" / "international_elo_ratings.csv"
+        elo_data = load_elo_ratings(str(elo_path))
+        
+        group_results, standings = simulate_group_stage(WC_2026_GROUPS, elo_data)
+        qualified = get_qualified_teams(standings)
+        bracket = simulate_knockouts(qualified, elo_data)
+        
+        return render_template(
+            "wc_predictor.html",
+            results={
+                "group_results": group_results,
+                "standings": standings,
+                "bracket": bracket
+            }
+        )
 
     @app.post("/api/predict")
     def api_predict():

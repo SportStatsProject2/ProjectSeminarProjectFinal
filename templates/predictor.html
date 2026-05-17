@@ -18,20 +18,11 @@
       <button class="primary-action" type="submit">Run prediction</button>
     </form>
 
-    <div class="panel" style="margin-top: 2rem;">
-      <h3>Underlying Mathematics</h3>
-      <p>This predictor uses a <strong>Monte Carlo simulation</strong> combined with the <strong>Poisson Distribution</strong>.</p>
-      
-      <h4>1. Expected Goals (xG) Calculation</h4>
-      <p>First, we calculate the offensive and defensive strength of each team, adjusted by their relative Elo ratings to find the expected goals for the match.</p>
-      
-      <h4>2. Poisson Distribution</h4>
-      <p>Football goals are modeled as discrete events occurring independently at a constant average rate. The probability of scoring <i>k</i> goals is given by:</p>
-      <code class="block">P(k; λ) = (λ^k * e^-λ) / k!</code>
-      <p>Where <strong>λ (lambda)</strong> is the expected goals (xG) for that team.</p>
-      
-      <h4>3. Monte Carlo Simulation</h4>
-      <p>We simulate the match 10,000+ times. In each simulation, we draw a random number of goals for both teams from their respective Poisson distributions. The final probabilities (Win/Draw/Loss) are the frequency of those outcomes across all simulations.</p>
+    <div class="panel model-panel">
+      <h3>Model Notes</h3>
+      <p>Expected goals combine attack strength, defensive resistance, and the Elo gap between the teams.</p>
+      <code class="formula-code">P(k; lambda) = (lambda^k * e^-lambda) / k!</code>
+      <p>Match probabilities come from repeated Poisson score draws using those expected-goal values.</p>
     </div>
   </div>
 
@@ -39,13 +30,21 @@
     {% if result %}
       <p class="eyebrow">{{ result.home_team }} vs {{ result.away_team }}</p>
       <h2>{{ result.expected_goals.home }} - {{ result.expected_goals.away }} xG</h2>
-      
-      <!-- Probability Chart -->
-      <div id="outcome-chart" style="height: 300px;"></div>
-      
-      <div class="metric-row"><span>Home win</span><strong>{{ (result.probabilities.home_win * 100)|round(1) }}%</strong></div>
-      <div class="metric-row"><span>Draw</span><strong>{{ (result.probabilities.draw * 100)|round(1) }}%</strong></div>
-      <div class="metric-row"><span>Away win</span><strong>{{ (result.probabilities.away_win * 100)|round(1) }}%</strong></div>
+
+      <div class="probability-list">
+        <div class="probability-row">
+          <div><span>Home win</span><strong>{{ (result.probabilities.home_win * 100)|round(1) }}%</strong></div>
+          <span class="probability-track"><span style="width: {{ result.probabilities.home_win * 100 }}%;"></span></span>
+        </div>
+        <div class="probability-row">
+          <div><span>Draw</span><strong>{{ (result.probabilities.draw * 100)|round(1) }}%</strong></div>
+          <span class="probability-track"><span style="width: {{ result.probabilities.draw * 100 }}%;"></span></span>
+        </div>
+        <div class="probability-row">
+          <div><span>Away win</span><strong>{{ (result.probabilities.away_win * 100)|round(1) }}%</strong></div>
+          <span class="probability-track"><span style="width: {{ result.probabilities.away_win * 100 }}%;"></span></span>
+        </div>
+      </div>
       
       <h3>Most likely scores</h3>
       <ol class="score-list">
@@ -53,28 +52,6 @@
           <li><span>{{ score.score }}</span><strong>{{ (score.probability * 100)|round(1) }}%</strong></li>
         {% endfor %}
       </ol>
-
-      <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-      <script>
-        var data = [{
-          values: [{{ result.probabilities.home_win }}, {{ result.probabilities.draw }}, {{ result.probabilities.away_win }}],
-          labels: ['{{ result.home_team }} Win', 'Draw', '{{ result.away_team }} Win'],
-          type: 'pie',
-          hole: .4,
-          marker: {
-            colors: ['#4ade80', '#94a3b8', '#f87171']
-          },
-          textinfo: 'percent'
-        }];
-        var layout = {
-          height: 300,
-          margin: { t: 20, b: 20, l: 20, r: 20 },
-          paper_bgcolor: 'rgba(0,0,0,0)',
-          plot_bgcolor: 'rgba(0,0,0,0)',
-          showlegend: false
-        };
-        Plotly.newPlot('outcome-chart', data, layout);
-      </script>
     {% else %}
       <p class="empty-state">Adjust the team ratings and run the forecast to compare win probabilities and likely scorelines.</p>
     {% endif %}

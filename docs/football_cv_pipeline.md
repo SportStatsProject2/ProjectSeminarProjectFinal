@@ -1,6 +1,6 @@
 # Football Computer-Vision Pipeline
 
-This implements the full project from the video transcript with updated runtime choices.
+This document describes the video-analysis pipeline used by the Flask app and CLI.
 
 ## Implemented Steps
 
@@ -19,12 +19,12 @@ This implements the full project from the video transcript with updated runtime 
 13. Estimate player speed and distance covered.
 14. Save an annotated output video.
 
-## Why This Differs From The Old Video
+## Implementation Notes
 
 - The code uses Ultralytics `model.track(..., tracker="bytetrack.yaml", persist=True)` instead of manually calling `supervision.ByteTrack`. This avoids depending on old `supervision` API names.
 - Shirt-color clustering uses NumPy instead of scikit-learn, so the app does not need another heavy dependency.
 - Ball interpolation uses NumPy instead of pandas.
-- The web app does not silently download a pretrained model by default. Put trained weights at `models/best.pt` for reproducible demos.
+- The web app uses the project-trained detector at `models/best.pt`. If that file is missing, it can download the release asset configured by `YOLO_MODEL_URL`.
 
 ## Run
 
@@ -37,7 +37,7 @@ Use `--no-stubs` after changing model weights or calibration values.
 
 ## Calibration
 
-The perspective transform uses default pixel vertices for the Bundesliga 1080p sample from the video:
+The perspective transform uses default pixel vertices for the bundled Bundesliga-style 1080p reference clip:
 
 ```text
 (110, 1035), (265, 275), (910, 260), (1640, 915)

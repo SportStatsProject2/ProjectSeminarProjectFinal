@@ -17,7 +17,7 @@
         <button class="secondary-action" type="button" data-load-sample>Load sample XI</button>
         <button class="secondary-action" type="button" data-clear-network>Clear</button>
       </div>
-      <p class="processing-state network-edit-state" data-network-state hidden>JSON changed. Update the network to redraw the pitch.</p>
+      <p class="processing-state network-edit-state" data-network-state>Loaded: {{ network.total_passes }} passes / {{ network.player_count }} players</p>
     </form>
   </div>
 
@@ -126,12 +126,35 @@
     const state = networkForm.querySelector("[data-network-state]");
     const sample = {{ sample_events|tojson }};
     const original = input ? input.value : "";
+    const getEvents = (value) => {
+      if (!value.trim()) return [];
+      const payload = JSON.parse(value);
+      const events = Array.isArray(payload) ? payload : payload.passes;
+      if (!Array.isArray(events)) throw new Error("Pass data must be an array");
+      return events;
+    };
+    const summarizeEvents = (events) => {
+      const players = new Set();
+      events.forEach((event) => {
+        if (event && typeof event.passer === "string" && event.passer.trim()) players.add(event.passer.trim());
+        if (event && typeof event.receiver === "string" && event.receiver.trim()) players.add(event.receiver.trim());
+      });
+      return `${events.length} passes / ${players.size} players`;
+    };
     const setDirtyState = () => {
       if (!input || !state) return;
-      state.hidden = input.value === original;
+      try {
+        const label = input.value === original ? "Loaded" : "Pending";
+        state.textContent = `${label}: ${summarizeEvents(getEvents(input.value))}`;
+        state.classList.remove("status-error");
+      } catch (_error) {
+        state.textContent = "Pending: invalid JSON";
+        state.classList.add("status-error");
+      }
     };
     if (input) {
       input.addEventListener("input", setDirtyState);
+      setDirtyState();
     }
     networkForm.addEventListener("submit", () => {
       if (submit) {

@@ -7,7 +7,7 @@
 - Colab training template.
 - Runtime pipeline that expects `models/best.pt`.
 
-## What You Must Do
+## Training Workflow
 
 1. Download the match video.
 
@@ -35,7 +35,7 @@
 
 3. Train on GPU.
 
-   Use Colab or another GPU machine. The demo baseline was trained with `yolov8s.pt`, 100 epochs, `imgsz=640`, and `batch=16` on a Colab T4:
+   Use Colab or another GPU machine. The current baseline was trained with `yolov8s.pt`, 100 epochs, `imgsz=640`, and `batch=16` on a Colab T4:
 
    ```bash
    python scripts/train_yolo.py \
@@ -68,16 +68,16 @@
    python yolo_inference.py football_analysis/input_videos/08fd33_4.mp4 --model models/best.pt --max-frames 120
    ```
 
-6. Run the Flask demo.
+6. Run the Flask app.
 
    ```bash
    flask --app app run --debug
    ```
 
-## Practical Demo Advice
+## Runtime Notes
 
-- Keep `VISION_MAX_FRAMES=120` or `300` during development so the demo is fast.
+- Keep `VISION_MAX_FRAMES=120` or `300` during development when you need a short smoke test.
 - Use cached stubs unless you change the model or calibration.
 - Run with `--no-stubs` after changing weights, camera-motion logic, or perspective vertices.
-- Validate the trained detector before the demo. The first `yolov8s.pt` 100-epoch run produced strong player/referee/goalkeeper metrics, while ball recall remained the main limitation.
+- Validate the trained detector before presenting results. The first `yolov8s.pt` 100-epoch run produced strong player/referee/goalkeeper metrics, while ball recall remained the main limitation.
 - Do not commit `.pt` files, videos, generated outputs, stubs, or `runs/` folders.

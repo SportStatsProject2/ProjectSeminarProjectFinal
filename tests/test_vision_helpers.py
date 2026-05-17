@@ -1,11 +1,15 @@
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 
 import numpy as np
 
 from sportstats.vision.ball_assignment import PlayerBallAssigner
 from sportstats.vision.geometry import get_center_of_bbox, get_foot_position, measure_distance
+from sportstats.vision.pipeline import _frames_with_tracks
 from sportstats.vision.team_assignment import TeamAssigner, kmeans
 from sportstats.vision.tracking import FootballTracker, _tracks_match_frame_count
+from sportstats.vision.video import _encode_h264
 
 
 class VisionHelpersTest(unittest.TestCase):

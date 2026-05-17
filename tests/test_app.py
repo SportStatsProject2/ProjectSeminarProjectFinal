@@ -1,5 +1,4 @@
 from io import BytesIO
-from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -46,7 +45,7 @@ class AppTest(unittest.TestCase):
 
     def test_vision_accepts_video_upload_and_returns_analysis_state(self):
         result = FootballAnalysisResult(status="unavailable", message="Add trained weights before running vision.")
-        with patch("sportstats.web.analyze_video", return_value=result):
+        with patch("sportstats.web.analyze_video", return_value=result) as analyze:
             response = self.client.post(
                 "/vision",
                 data={"video": (BytesIO(b"fake mp4 content"), "clip.mp4")},
@@ -55,7 +54,9 @@ class AppTest(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Add trained weights", response.data)
-        self.assertTrue((Path(self.app.config["UPLOAD_FOLDER"]) / "clip.mp4").exists())
+        saved_path = analyze.call_args.args[0]
+        self.assertRegex(saved_path.name, r"^clip_[a-f0-9]{8}\.mp4$")
+        self.assertTrue(saved_path.exists())
 
 
 if __name__ == "__main__":

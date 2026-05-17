@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}xG Calculator{% endblock %}
+{% block content %}
+<section class="split-layout">
+  <div>
+    <p class="eyebrow">Metric Analysis</p>
+    <h1>Expected Goals (xG) Calculator</h1>
+    <p class="lead">Adjust the shot parameters to calculate the probability of a goal based on historical data.</p>
+    
+    <form class="panel form-grid" method="post" action="{{ url_for('xg_calculator_submit') }}">
+      <label>X Position (60-120) <input type="number" step="0.5" name="x" min="60" max="120" value="{{ result.x if result else 85.0 }}" required></label>
+      <label>Y Position (0-80) <input type="number" step="0.5" name="y" min="0" max="80" value="{{ result.y if result else 40.0 }}" required></label>
+      <label>Body Part 
+        <select name="body_part">
+          <option value="Foot" {% if result and result.body_part == 'Foot' %}selected{% endif %}>Foot</option>
+          <option value="Header" {% if result and result.body_part == 'Header' %}selected{% endif %}>Header</option>
+          <option value="Other" {% if result and result.body_part == 'Other' %}selected{% endif %}>Other</option>
+        </select>
+      </label>
+      <button class="primary-action" type="submit">Calculate xG</button>
+    </form>
+
+    <div class="panel" style="margin-top: 2rem;">
+      <h3>Underlying Formula</h3>
+      <p>The xG model uses a <strong>logistic regression</strong> formula to estimate the probability of a shot resulting in a goal:</p>
+      <code class="block">z = -1.5 - (0.09 * distance) + (0.05 * angle)</code>
+      <code class="block">xG = 1 / (1 + exp(-z))</code>
+      <p>Where:</p>
+      <ul>
+        <li><strong>Distance:</strong> The Euclidean distance from the shot location to the center of the goal.</li>
+        <li><strong>Angle:</strong> The visible angle of the goal from the shot location.</li>
+      </ul>
+      <p>Headers are assigned a 40% penalty (multiplier of 0.6) to reflect their lower historical conversion rate compared to shots from the foot.</p>
+    </div>
+  </div>
+
+  <aside class="panel result-panel">
+    {% if result %}
+      <p class="eyebrow">Shot Result</p>
+      <h2 style="font-size: 4rem; margin: 1rem 0;">{{ result.xg }} <small>xG</small></h2>
+      <div class="metric-row"><span>Distance</span><strong>{{ result.distance }} yds</strong></div>
+      <div class="metric-row"><span>Angle</span><strong>{{ result.angle }}°</strong></div>
+      <div class="metric-row"><span>Body Part</span><strong>{{ result.body_part }}</strong></div>
+      
+      <div style="margin-top: 2rem; border: 1px solid var(--border); border-radius: 8px; background: #1a472a; position: relative; aspect-ratio: 3/2; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.3);">
+        <div style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, #2d5a3c, #2d5a3c 10%, #244d31 10%, #244d31 20%);"></div>
+        <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; border: 2px solid rgba(255,255,255,0.6); margin: 5px;"></div>
+        <div style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 6%; height: 22.5%; border: 2px solid rgba(255,255,255,0.6); border-right: none;"></div>
+        <div style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 20%; height: 55%; border: 2px solid rgba(255,255,255,0.6); border-right: none;"></div>
+        <div style="position: absolute; right: 5px; top: 35%; bottom: 35%; width: 2px; background: white; z-index: 5;"></div>
+        <div style="position: absolute; right: 20%; top: 50%; transform: translate(50%, -50%); width: 15%; aspect-ratio: 1; border: 2px solid rgba(255,255,255,0.6); border-radius: 50%; clip-path: inset(0 50% 0 0);"></div>
+
+        {% set pitch_x_pct = (result.x - 60) / 60 * 100 %}
+        {% set pitch_y_pct = result.y / 80 * 100 %}
+        <div style="position: absolute; left: {{ pitch_x_pct }}%; top: {{ pitch_y_pct }}%; width: 16px; height: 16px; background: #fffb00; border-radius: 50%; border: 3px solid #000; transform: translate(-50%, -50%); z-index: 20; box-shadow: 0 0 15px #fffb00;"></div>
+        
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;">
+          <line x1="{{ pitch_x_pct }}%" y1="{{ pitch_y_pct }}%" x2="100%" y2="45%" stroke="rgba(255,251,0,0.4)" stroke-width="2" stroke-dasharray="4" />
+          <line x1="{{ pitch_x_pct }}%" y1="{{ pitch_y_pct }}%" x2="100%" y2="55%" stroke="rgba(255,251,0,0.4)" stroke-width="2" stroke-dasharray="4" />
+        </svg>
+      </div>
+    {% else %}
+      <p class="empty-state">Enter shot coordinates and parameters to calculate the expected goal value.</p>
+    {% endif %}
+  </aside>
+</section>
+{% endblock %}

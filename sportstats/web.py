@@ -12,6 +12,7 @@ from sportstats.config import BASE_DIR, Config
 from sportstats.services.passing_network import build_demo_network, build_network, demo_passes_json
 from sportstats.services.prediction import TeamProfile, predict_match
 from sportstats.services.yolo import analyze_video, is_allowed_video
+from sportstats.services.xg_calculator import calculate_geometry, calculate_xg
 
 
 def create_app(config_object: type[Config] = Config) -> Flask:
@@ -37,6 +38,36 @@ def create_app(config_object: type[Config] = Config) -> Flask:
     def predictor_submit():
         result = _prediction_from_mapping(request.form.to_dict())
         return render_template("predictor.html", result=result)
+
+    @app.get("/xg-calculator")
+    def xg_calculator():
+        return render_template("xg_calculator.html", result=None)
+
+    @app.post("/xg-calculator")
+    def xg_calculator_submit():
+        try:
+            x = float(request.form.get("x", 85.0))
+            y = float(request.form.get("y", 40.0))
+        except ValueError:
+            x, y = 85.0, 40.0
+
+        # Clamp values to valid range
+        x = max(60.0, min(120.0, x))
+        y = max(0.0, min(80.0, y))
+
+        body_part = request.form.get("body_part", "Foot")
+        distance, angle = calculate_geometry(x, y)
+        xg = calculate_xg(distance, angle, body_part)
+
+        result = {
+            "x": x,
+            "y": y,
+            "distance": round(distance, 1),
+            "angle": round(angle, 1),
+            "body_part": body_part,
+            "xg": round(xg, 3)
+        }
+        return render_template("xg_calculator.html", result=result)
 
     @app.post("/api/predict")
     def api_predict():

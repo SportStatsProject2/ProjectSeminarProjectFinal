@@ -1,23 +1,92 @@
 {% extends "base.html" %}
 {% block title %}Architecture{% endblock %}
 {% block content %}
-<section class="content-stack">
-  <div>
-    <p class="eyebrow">System design</p>
-    <h1>Architecture and Responsibilities</h1>
+<section class="content-stack architecture-page">
+  <div class="architecture-hero">
+    <div>
+      <p class="eyebrow">System design</p>
+      <h1>Architecture and Responsibilities</h1>
+      <p class="lead">SportStats combines Flask routes, statistical services, event-graph analytics, and a YOLO/OpenCV video pipeline behind one web interface.</p>
+    </div>
+    <div class="panel authors-panel">
+      <span>Authors</span>
+      <strong>Daniel Emeka-Ilozor</strong>
+      <strong>Assylkhan Balmukhanov</strong>
+    </div>
   </div>
-  <div class="diagram">
-    <div>Flask routes</div>
+
+  <section class="architecture-flow" aria-label="Application architecture flow">
+    <div>Browser UI</div>
+    <span></span>
+    <div>Flask app factory</div>
     <span></span>
     <div>Analytics services</div>
     <span></span>
-    <div>Vision pipeline</div>
-  </div>
-  <section class="feature-grid">
-    <article class="feature-card"><span class="feature-kicker">Web layer</span><h2>sportstats.create_app</h2><p>Routes, uploads, request validation, logging, and template rendering.</p></article>
-    <article class="feature-card"><span class="feature-kicker">Stat models</span><h2>prediction.py</h2><p>Poisson expected goals and Monte Carlo match simulation.</p></article>
-    <article class="feature-card"><span class="feature-kicker">Event graphics</span><h2>passing_network.py</h2><p>Pass-event aggregation into graph nodes and weighted links.</p></article>
-    <article class="feature-card"><span class="feature-kicker">Computer vision</span><h2>sportstats.vision</h2><p>YOLO tracking, team assignment, ball control, optical flow, perspective transform, speed, and distance.</p></article>
+    <div>Data, model assets, and generated outputs</div>
+  </section>
+
+  <section class="architecture-grid">
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Web layer</span>
+      <h2>sportstats.web</h2>
+      <p>Server-rendered pages, form validation, video uploads, JSON API responses, runtime folders, and error handling.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Forecasting</span>
+      <h2>prediction.py</h2>
+      <p>Poisson score draws with Elo, attack, and defense inputs for match probabilities and likely scorelines.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Shot model</span>
+      <h2>xg_calculator.py</h2>
+      <p>Distance, goal angle, and body-part inputs converted into expected-goal probability.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Ratings</span>
+      <h2>elo_engine.py</h2>
+      <p>International results are converted into Elo ratings used by the ratings page and World Cup model.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Tournament model</span>
+      <h2>wc_predictor.py</h2>
+      <p>2026 groups, Elo-driven match xG, qualification rules, fixed knockout path, and bronze/final projections.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Event graph</span>
+      <h2>passing_network.py</h2>
+      <p>Pass-event JSON validation, average player positions, weighted links, central player, density, and progression metrics.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Computer vision</span>
+      <h2>sportstats.vision</h2>
+      <p>YOLO tracking, team assignment, ball interpolation, possession, camera correction, perspective transform, speed, and distance.</p>
+    </article>
+    <article class="panel architecture-card">
+      <span class="feature-kicker">Model assets</span>
+      <h2>model_assets.py</h2>
+      <p>Checks local `models/best.pt`, downloads the public release asset when configured, and keeps generated video outputs under `static/outputs`.</p>
+    </article>
+  </section>
+
+  <section class="delivery-grid">
+    <article class="panel">
+      <p class="eyebrow">Implemented</p>
+      <ul class="check-list">
+        <li>Match predictor with Elo/team-strength inputs</li>
+        <li>xG calculator with shot-map visualization</li>
+        <li>International Elo ratings table</li>
+        <li>2026 World Cup projection with group and knockout stages</li>
+        <li>Passing-network editor with JSON validation and live event/player counts</li>
+        <li>YOLO football video analysis with trained-model download support</li>
+        <li>Docker setup, CI checks, unit tests, and project documentation</li>
+      </ul>
+    </article>
+    <article class="panel">
+      <p class="eyebrow">Not implemented</p>
+      <ul class="check-list muted-list">
+        <li>Automated pass extraction from video into the passing-network page</li>
+      </ul>
+    </article>
   </section>
 </section>
 {% endblock %}

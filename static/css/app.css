@@ -363,6 +363,51 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 .diagram { align-items: center; display: grid; gap: 14px; grid-template-columns: 1fr 48px 1fr 48px 1fr; }
 .diagram div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-weight: 900; padding: 22px; text-align: center; }
 .diagram span { background: var(--green); height: 3px; }
+.architecture-page { gap: 30px; }
+.architecture-hero {
+  align-items: end;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+}
+.authors-panel { display: grid; gap: 7px; }
+.authors-panel span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.authors-panel strong { color: var(--ink); font-size: 18px; line-height: 1.2; }
+.architecture-flow {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr;
+}
+.architecture-flow div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 18px 45px rgba(22, 34, 27, 0.06);
+  font-weight: 900;
+  min-height: 84px;
+  padding: 20px;
+  text-align: center;
+}
+.architecture-flow span { background: var(--green); height: 3px; }
+.architecture-grid { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.architecture-card { display: grid; gap: 8px; min-height: 220px; }
+.architecture-card h2, .architecture-card p { margin: 0; }
+.delivery-grid { display: grid; gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.check-list {
+  color: var(--ink);
+  display: grid;
+  gap: 10px;
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 18px;
+}
+.muted-list { color: var(--muted); }
 .wc-page { display: grid; gap: 30px; }
 .wc-hero {
   align-items: end;
@@ -554,12 +599,13 @@ video { border-radius: 8px; margin-top: 18px; max-width: 100%; }
 }
 
 @media (max-width: 900px) {
-  .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables, .wc-hero { grid-template-columns: 1fr; }
+  .topbar, .hero, .split-layout, .diagram, .passing-layout, .network-tables, .wc-hero, .architecture-hero, .architecture-flow, .architecture-grid, .delivery-grid { grid-template-columns: 1fr; }
   .topbar { align-items: flex-start; padding: 16px 20px; }
   .feature-grid, .form-grid, .metric-grid, .network-metrics, .form-actions, .wc-summary-grid, .wc-group-grid, .wc-seed-row { grid-template-columns: 1fr; }
   .network-header { display: grid; }
   h1 { font-size: 36px; }
   .diagram span { height: 24px; justify-self: center; width: 3px; }
+  .architecture-flow span { height: 22px; justify-self: center; width: 3px; }
   .wc-section-header { display: grid; }
   .wc-bronze-pill, .wc-qualified-count { border-radius: 8px; white-space: normal; }
   .wc-bracket { grid-template-columns: 1fr; min-width: 0; }

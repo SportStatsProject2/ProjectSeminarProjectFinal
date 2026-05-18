@@ -76,16 +76,42 @@ For Colab, use `training/colab_football_training.md`.
 
 ## Docker
 
-Lightweight web app:
+Docker is the simplest reproducible run path for grading because it builds the same Python runtime and starts Flask on port `5000`.
 
 ```bash
+cp .env.example .env
 docker compose up --build
 ```
 
-With optional YOLO runtime:
+Open http://127.0.0.1:5000.
+
+The default Docker run starts the lightweight web app: match predictor, xG calculator, Elo ratings, World Cup predictor, passing network, architecture page, and the vision page shell.
+
+For the full YOLO video-analysis runtime, build with the optional CV dependencies:
 
 ```bash
+cp .env.example .env
 INSTALL_VISION=true docker compose up --build
+```
+
+The compose file mounts these local folders into the container so uploads, generated videos, cached stubs, and model weights survive container restarts:
+
+```text
+./static/uploads      -> /app/static/uploads
+./static/outputs      -> /app/static/outputs
+./football_analysis/stubs -> /app/football_analysis/stubs
+./models              -> /app/models
+```
+
+`YOLO_MODEL_URL` is already set in `.env.example`, so the app can download the public `models/best.pt` release asset on the first video run if it is not already in `./models`.
+
+Useful Docker commands:
+
+```bash
+docker compose up --build          # build and start the app
+docker compose down                # stop containers
+docker compose logs -f web         # follow Flask logs
+docker compose exec web flask --app app routes
 ```
 
 ## Tests

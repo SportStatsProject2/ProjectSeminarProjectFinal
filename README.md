@@ -158,6 +158,6 @@ Every issue should have acceptance criteria and an assignee. Every PR should ref
 
 ## Team Roles
 
-- Daniel: YOLO/OpenCV video analysis, detector training, model integration, CV presentation workflow.
-- Assylkhan Balmukhanov: Flask website, statistical predictor, Elo/Monte Carlo workstream, CI/CD, documentation, release workflow.
-- Shared: issues, PR reviews, demo script, README updates, and final seminar presentation.
+- Daniel Emeka-Ilozor: Flask website, YOLO/OpenCV video analysis, detector training, model integration, CI/CD, documentation, release workflow, and CV presentation workflow.
+- Assylkhan Balmukhanov: statistical predictor, Elo/Monte Carlo workstream, and World Cup section.
+- Shared: issues, PR reviews, demo script, and final seminar presentation.
